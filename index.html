@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Klasifikasi Investasi — PHR</title>
+<style>
+  :root{
+    --bg:#f2f2f7;
+    --panel:#ffffff;
+    --panel-2:#f2f2f7;
+    --border:#e5e5ea;
+    --border-soft:#ececf0;
+    --text:#1a2233;
+    --text-muted:#5b6b80;
+    --text-faint:#8695a7;
+    --accent-a:#2451fd;
+    --accent-a-dim:#e5eaff;
+    --accent-b:#071b2e;
+    --accent-b-dim:#e1e4e6;
+    --accent-c:#00a9f6;
+    --accent-c-dim:#e0f5fe;
+    --accent-d:#0e7c9e;
+    --accent-d-dim:#e2eff3;
+    --danger:#c9432e;
+    --ok:#1f8f68;
+    --radius:16px;
+    --radius-sm:12px;
+    /* skala tipografi Fibonacci: 8, 13, 21, 34, 55 */
+    --fs-1:8px;   /* micro: timestamp, unit hint */
+    --fs-2:13px;  /* body/base: teks default, tombol, label */
+    --fs-3:21px;  /* subheading: judul step, judul kartu */
+    --fs-4:34px;  /* display: kode/angka besar */
+    --fs-5:55px;  /* hero: kesimpulan kategori di halaman hasil */
+    font-size:var(--fs-2);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .mono{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif}
+  .display{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif}
+
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(36,81,253,0.05), transparent 45%),
+      var(--bg);
+    position:relative;
+  }
+
+  /* ---------- header ---------- */
+  header.topbar{
+    padding:18px 18px 12px;
+    border-bottom:1px solid var(--border-soft);
+    position:sticky;
+    top:0;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(6px);
+    z-index:20;
+  }
+  header.topbar .brandrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  header.topbar .brandmark{
+    width:30px;height:30px;border-radius:7px;
+    background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-weight:600;font-size:var(--fs-2);color:#ffffff;
+    flex-shrink:0;
+  }
+  header.topbar h1{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);
+    font-weight:600;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  header.topbar .ref{
+    margin:6px 0 0;
+    font-size:var(--fs-1);
+    color:var(--text-faint);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    letter-spacing:0.2px;
+    line-height:1.5;
+  }
+  .disclaimer{
+    margin-top:10px;
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    background:var(--panel-2);
+    border:1px solid var(--border-soft);
+    border-left:2px solid var(--accent-a);
+    padding:8px 10px;
+    border-radius:6px;
+    line-height:1.5;
+  }
+
+  /* ---------- main ---------- */
+  main#view{
+    flex:1;
+    padding:16px 16px 90px;
+    overflow-y:auto;
+  }
+
+  .progress-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .progress-label{
+    font-size:var(--fs-2);
+    color:var(--text-faint);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+  }
+  .progress-track{
+    height:3px;
+    background:var(--border-soft);
+    border-radius:3px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--accent-a);
+    border-radius:3px;
+    transition:width .25s ease;
+  }
+
+  h2.stepq{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-3);
+    font-weight:600;
+    line-height:1.35;
+    margin:0 0 4px;
+  }
+  p.stephint{
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    margin:0 0 18px;
+    line-height:1.5;
+  }
+
+  .field{
+    margin-bottom:14px;
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:14px 16px 16px;
+    box-shadow:0 1px 2px rgba(26,34,51,0.05);
+  }
+  .field label{
+    display:block;
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .field input[type=text],
+  .field input[type=number],
+  .field textarea{
+    width:100%;
+    background:var(--panel-2);
+    border:1px solid transparent;
+    color:var(--text);
+    border-radius:var(--radius-sm);
+    padding:12px 13px;
+    font-size:var(--fs-2);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    outline:none;
+  }
+  .field input:focus,.field textarea:focus{border-color:var(--accent-a);}
+  .field textarea{resize:vertical;min-height:64px;}
+  .field .unit{font-size:var(--fs-2);color:var(--text-faint);margin-top:8px;}
+  .field .req{color:var(--danger);}
+  .field.has-error input,.field.has-error textarea{border-color:var(--danger);}
+  .field .error-msg{font-size:var(--fs-2);color:var(--danger);margin-top:8px;font-weight:600;}
+
+  .choice-card{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    width:100%;
+    text-align:left;
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius);
+    padding:14px 14px;
+    margin-bottom:10px;
+    color:var(--text);
+    box-shadow:0 1px 2px rgba(26,34,51,0.05);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-card:active{background:var(--panel-2);}
+  .choice-card:hover{border-color:var(--accent-a);}
+  .choice-card .tag{
+    flex-shrink:0;
+    width:30px;height:30px;
+    border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);font-weight:600;
+    margin-top:1px;
+  }
+  .choice-card .body b{
+    display:block;
+    font-size:var(--fs-2);
+    font-weight:600;
+    margin-bottom:3px;
+  }
+  .choice-card .body span{
+    display:block;
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+
+  .group-label{
+    font-size:var(--fs-2);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--text-faint);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    margin:18px 0 8px;
+    padding-top:4px;
+    border-top:1px solid var(--border-soft);
+  }
+  .group-label:first-child{margin-top:0;border-top:none;padding-top:0;}
+
+  .search-box{
+    margin-bottom:14px;
+  }
+  .search-box input{
+    width:100%;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:var(--radius-sm);
+    padding:11px 13px;
+    font-size:var(--fs-2);
+    outline:none;
+  }
+  .search-box input:focus{border-color:var(--accent-a);}
+
+  .btnrow{display:flex;gap:10px;margin-top:6px;}
+  .btn{
+    flex:1;
+    padding:13px 16px;
+    border-radius:11px;
+    font-size:var(--fs-2);
+    font-weight:600;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    border:1px solid var(--border);
+    background:var(--panel);
+    color:var(--text);
+    cursor:pointer;
+    text-align:center;
+  }
+  .btn.primary{
+    background:var(--accent-a);
+    color:#ffffff;
+    border:none;
+  }
+  .btn.ghost{
+    background:transparent;
+    color:var(--text-muted);
+  }
+  .btn.small{flex:none;padding:9px 14px;font-size:var(--fs-2);}
+  .btn:disabled{opacity:0.4;}
+  .btn.full{width:100%;}
+
+  .backlink{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:none;
+    border:none;
+    color:var(--text-muted);
+    font-size:var(--fs-2);
+    padding:0 0 16px;
+    cursor:pointer;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+  }
+  .backlink:active{color:var(--text);}
+
+  .skiplink{
+    display:block;
+    text-align:center;
+    color:var(--text-faint);
+    font-size:var(--fs-2);
+    margin-top:14px;
+    background:none;border:none;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  .toggle-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .toggle-btn{
+    flex:1;
+    padding:11px;
+    border-radius:var(--radius-sm);
+    border:1px solid transparent;
+    background:var(--panel-2);
+    color:var(--text-muted);
+    font-size:var(--fs-2);
+    font-weight:600;
+    text-align:center;
+    cursor:pointer;
+  }
+  .toggle-btn.active{
+    border-color:var(--accent-a);
+    color:var(--accent-a);
+    background:var(--accent-a-dim);
+  }
+  .chiprow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .chip{
+    padding:8px 13px;
+    border-radius:99px;
+    border:1px solid transparent;
+    background:var(--panel-2);
+    color:var(--text-muted);
+    font-size:var(--fs-2);
+    font-weight:600;
+    cursor:pointer;
+  }
+  .chip.active{
+    border-color:var(--accent-b);
+    color:var(--accent-b);
+    background:var(--accent-b-dim);
+  }
+
+  /* ---------- result tag plate ---------- */
+  .tagplate{
+    position:relative;
+    background:linear-gradient(160deg,var(--panel-2),var(--panel));
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:22px 20px 20px;
+    margin-bottom:18px;
+    overflow:hidden;
+  }
+  .tagplate::before{
+    content:"";
+    position:absolute;top:0;left:0;right:0;height:3px;
+    background:var(--cat-color,var(--accent-a));
+  }
+  .rivet{
+    position:absolute;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:#c7cdd3;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,0.7), 0 0.5px 0 rgba(0,0,0,0.18);
+  }
+  .rivet.tl{top:10px;left:10px;} .rivet.tr{top:10px;right:10px;}
+  .rivet.bl{bottom:10px;left:10px;} .rivet.br{bottom:10px;right:10px;}
+  .tagplate .grouplabel{
+    font-size:var(--fs-5);
+    font-weight:700;
+    letter-spacing:0.3px;
+    color:var(--cat-color,var(--accent-a));
+    line-height:1.05;
+    margin-bottom:4px;
+  }
+  .tagplate .catname{
+    font-size:var(--fs-2);
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    color:var(--text-muted);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .tagplate .subcode{
+    font-size:var(--fs-3);
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:10px;
+  }
+  .tagplate .desc{
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    line-height:1.55;
+  }
+
+  .flagbox{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 15px;
+    margin-bottom:14px;
+  }
+  .flagbox h3{
+    font-size:var(--fs-2);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--text-faint);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  .flagitem{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    padding:8px 0;
+    border-top:1px solid var(--border-soft);
+    font-size:var(--fs-2);
+    line-height:1.5;
+  }
+  .flagitem:first-of-type{border-top:none;padding-top:0;}
+  .flagdot{
+    flex-shrink:0;
+    width:16px;height:16px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:var(--fs-1);
+    font-weight:700;
+    margin-top:1px;
+  }
+  .flagdot.yes{background:rgba(201,67,46,0.15);color:var(--danger);}
+  .flagdot.no{background:rgba(31,143,104,0.15);color:var(--ok);}
+  .flagdot.info{background:rgba(91,107,128,0.15);color:var(--text-muted);}
+
+  .refbox{
+    font-size:var(--fs-2);
+    color:var(--text-faint);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    line-height:1.7;
+    margin-bottom:18px;
+    padding:0 2px;
+  }
+
+  .note{
+    font-size:var(--fs-2);
+    color:var(--text-muted);
+    background:var(--panel);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-sm);
+    padding:11px 12px;
+    line-height:1.55;
+    margin-bottom:16px;
+  }
+
+  /* ---------- history ---------- */
+  .histcard{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:13px 14px;
+    margin-bottom:10px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
+  .histcard .codechip{
+    flex-shrink:0;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);
+    font-weight:600;
+    padding:5px 8px;
+    border-radius:6px;
+    margin-top:1px;
+  }
+  .histcard .info{flex:1;min-width:0;}
+  .histcard .info b{display:block;font-size:var(--fs-2);margin-bottom:2px;}
+  .histcard .info span{display:block;font-size:var(--fs-2);color:var(--text-muted);}
+  .histcard .info .date{font-size:var(--fs-1);color:var(--text-faint);margin-top:4px;}
+  .histcard .del{
+    flex-shrink:0;
+    background:none;border:none;
+    color:var(--text-faint);
+    font-size:var(--fs-3);
+    cursor:pointer;
+    padding:2px 4px;
+  }
+  .empty{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--text-faint);
+  }
+  .empty .glyph{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-4);
+    margin-bottom:10px;
+    color:var(--text-faint);
+  }
+  .empty p{font-size:var(--fs-2);line-height:1.6;margin:0;}
+
+  /* ---------- reference tab ---------- */
+  .refcat{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .refcat summary{
+    padding:14px 15px;
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    gap:11px;
+  }
+  .refcat summary::-webkit-details-marker{display:none;}
+  .refcat summary .tag{
+    width:32px;height:32px;border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:var(--fs-2);
+    flex-shrink:0;
+  }
+  .refcat summary b{font-size:var(--fs-2);display:block;}
+  .refcat summary span{font-size:var(--fs-2);color:var(--text-muted);}
+  .refcat .items{padding:0 15px 14px;}
+  .refitem{
+    padding:10px 0;
+    border-top:1px solid var(--border-soft);
+  }
+  .refitem .rcode{
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);
+    color:var(--text-faint);
+    margin-right:6px;
+  }
+  .refitem b{font-size:var(--fs-2);}
+  .refitem p{font-size:var(--fs-2);color:var(--text-muted);margin:3px 0 0;line-height:1.5;}
+
+  /* ---------- bottom nav ---------- */
+  nav.bottomnav{
+    position:sticky;
+    bottom:0;
+    display:flex;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(6px);
+    border-top:1px solid var(--border-soft);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  nav.bottomnav button{
+    flex:1;
+    background:none;
+    border:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    padding:6px 4px;
+    color:var(--text-faint);
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);
+    font-weight:600;
+    cursor:pointer;
+  }
+  nav.bottomnav button .navicon{
+    width:20px;height:20px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:6px;
+    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:var(--fs-2);
+    font-weight:700;
+    border:1.5px solid currentColor;
+  }
+  nav.bottomnav button.active{color:var(--accent-a);}
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:82px;
+    transform:translateX(-50%);
+    background:var(--accent-b);
+    border:1px solid var(--accent-b);
+    color:#ffffff;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:var(--fs-2);
+    box-shadow:0 8px 20px rgba(7,27,46,0.28);
+    z-index:50;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  ::selection{background:var(--accent-a-dim);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brandrow">
+      <div class="brandmark">KI</div>
+      <h1>Klasifikasi Investasi</h1>
+    </div>
+    <p class="ref">Fax No.133/PHE20000/2022-S0 · Pedoman A6-001/PHE11000/2023-S9 Rev.2 · IP: TA Arief Widiyatmoko</p>
+  </header>
+  <main id="view"></main>
+  <nav class="bottomnav">
+    <button data-nav="wizard"><span class="navicon">K</span>Klasifikasi</button>
+    <button data-nav="history"><span class="navicon">R</span>Riwayat</button>
+    <button data-nav="reference"><span class="navicon">D</span>Daftar</button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+// ============================================================
+// DATA — sumber: Lampiran Fax No.133/PHE20000/2022-S0
+// ============================================================
+var DATA = {
+  A: {
+    code:'A', key:'A',
+    title:'Investasi BD Pengembangan',
+    short:'BD Pengembangan',
+    subtitle:'Investasi dalam rangka meningkatkan profit perusahaan yang dapat dijustifikasi keekonomiannya.',
+    color:'var(--accent-a)', dim:'var(--accent-a-dim)',
+    items:[
+      {code:'A1', name:'Pengembangan Lapangan', desc:'Pengembangan lapangan inisial dan lanjutan: pemboran sumur pengembangan, penyambungan sumur, pembangunan fasilitas permukaan, untuk memproduksikan dan mengkomersialisasikan cadangan migas.'},
+      {code:'A2', name:'Kerja Ulang (Workover) BD', desc:'Aktivitas remedial/pemulihan sumur untuk meningkatkan atau mengaktifkan kembali produksi, tidak termasuk perawatan sumur (well service).', children:[
+        {code:'A2.a', name:'Perforasi Pindah Lapisan', desc:'Perforasi pada lapisan baru yang menghasilkan peningkatan produksi dan pengurasan (recovery).'},
+        {code:'A2.b', name:'Pendalaman Sumur', desc:'Pendalaman sumur (deepening) pengembangan — bukan interval eksplorasi — untuk mengakses lapisan baru.'},
+        {code:'A2.c', name:'Perubahan Lifting Method', desc:'Perubahan mekanisme produksi dari sembur alam (natural flow) ke artificial lift (gas lift, SRP, ESP, PCP, dll).'},
+        {code:'A2.d', name:'Perubahan Fungsi Sumur (Injeksi ↔ Produksi)', desc:'Perubahan fungsi sumur dari injeksi ke produksi atau sebaliknya, untuk peningkatan produksi dan pengurasan.'}
+      ]},
+      {code:'A3', name:'Lowering Pressure', desc:'Instalasi fasilitas permukaan (unit kompresi, pompa, dll) untuk menurunkan wellhead flowing pressure (WHFP).'},
+      {code:'A4', name:'Secondary Recovery', desc:'Instalasi fasilitas permukaan beserta pemboran/workover sumur injeksi (air/gas) untuk skema water flood atau pressure maintenance.'},
+      {code:'A5', name:'Enhanced Oil Recovery (EOR) Full Scale', desc:'Implementasi full scale proyek EOR skala lapangan: chemical (CEOR), gas (miscible, CO2, N2), termal, atau teknologi lain.'},
+      {code:'A6', name:'Field Reactivation', desc:'Reaktivasi lapangan idle (cadangan sudah downgrade ke contingent resources) melalui workover, artificial lift, dan/atau refurbishment fasilitas.'}
+    ]
+  },
+  B: {
+    code:'B', key:'B',
+    title:'Investasi NBD Pengembangan dan Produksi',
+    short:'NBD Pengembangan',
+    subtitle:'Investasi dalam rangka mempertahankan value perusahaan dan/atau tujuan strategis.',
+    color:'var(--accent-b)', dim:'var(--accent-b-dim)',
+    items:[
+      {code:'B1', name:'Baseline Recovery', desc:'Pemulihan akses ke reservoir akibat kendala sumuran (unforeseen), dikerjakan sebelum cadangan downgrade ke contingent resources.'},
+      {code:'B2', name:'Kerja Ulang (Workover) NBD', desc:'Bagian dari aktivitas workover dengan tujuan selain penambahan produksi/pengurasan — misalnya HSSE dan well integrity.'},
+      {code:'B3', name:'HSSE dan ESG', desc:'Peningkatan kinerja/kepatuhan HSSE & ESG: fire & gas system, safety shutdown system, produced water reinjection, CCUS, flare/vent gas recovery, low carbon power/heat, dll.'},
+      {code:'B4', name:'Kehandalan Operasi (Operational Excellence)', desc:'Upgrading fasilitas existing untuk mengurangi disrupsi operasi, Lost Production Opportunity (LPO), dan kegagalan peralatan/downtime.'},
+      {code:'B5', name:'Operation Support', desc:'Instalasi fasilitas dan pengadaan peralatan yang tidak berhubungan langsung dengan operasi produksi: kantor, warehouse, workshop, dll.'},
+      {code:'B6', name:'Integrity dan Obsolescence', desc:'Kegiatan non-rutin mempertahankan/meningkatkan integritas fasilitas, dan penggantian peralatan/sistem yang obsolete atau terdegradasi.'},
+      {code:'B7', name:'Asset Restoration', desc:'Penggantian fasilitas produksi karena degradasi atau kerusakan akibat insiden.'},
+      {code:'B8', name:'Rotating Equipment Change Out', desc:'Penggantian rotating equipment termasuk ESP. Equipment berupa paket peralatan, bukan spare part.'},
+      {code:'B9', name:'Pilot Project', desc:'Implementasi proyek skala kecil untuk menilai kelayakan proyek full scale.'},
+      {code:'B10', name:'Pilot EOR', desc:'Penerapan EOR skala kecil untuk mengetahui nilai komersial metode EOR sebagai referensi pengembangan skala lapangan.'},
+      {code:'B11', name:'Field Trial EOR', desc:'Tahapan uji coba lapangan sebagai bagian dari Pilot EOR untuk mengurangi risiko teknis. Tidak berdiri sendiri.'}
+    ]
+  },
+  C: {
+    code:'C', key:'C',
+    title:'Biaya Pra-Proyek',
+    short:'Biaya Pra-Proyek',
+    subtitle:'Biaya penyiapan usulan Investasi di Tahap Kajian Lanjut sampai diperolehnya keputusan Investasi (FID/Pre-FID/Pre-ID). Perlu persetujuan tertulis Direktur Pengusul.',
+    color:'var(--accent-c)', dim:'var(--accent-c-dim)',
+    items:[
+      {code:'C1', name:'Site Survey', desc:'Survei lapangan untuk mendukung kegiatan engineering dan konstruksi.'},
+      {code:'C2', name:'Pengadaan Lahan < 10 Ha', desc:'Pengadaan lahan untuk fasilitas produksi/pemboran sumur di lapangan onshore, maksimum 10 Ha.'},
+      {code:'C3', name:'Penyiapan Lahan (Site Preparation)', desc:'Penyiapan lahan untuk fasilitas produksi/pemboran sumur di lapangan onshore.'},
+      {code:'C4', name:'Front End Engineering Design (FEED)', desc:'Seluruh kegiatan engineering di Tahap Kajian Lanjut.'},
+      {code:'C5', name:'Perizinan dan Formalities', desc:'Seluruh kegiatan pengurusan dan persetujuan perizinan dan formalities.'},
+      {code:'C6', name:'Pembangunan Akses Kegiatan Proyek', desc:'Pembangunan akses jalan untuk kegiatan proyek di lapangan onshore.'}
+    ]
+  },
+  D: {
+    code:'D', key:'D',
+    title:'Biaya Operasi (ABO)',
+    short:'Biaya Operasi',
+    subtitle:'Kegiatan yang berhubungan langsung dengan operasi produksi.',
+    color:'var(--accent-d)', dim:'var(--accent-d-dim)',
+    items:[
+      {code:'D1', name:'Kerja Ulang (Workover) ABO', desc:'Bagian dari aktivitas workover yang tidak dapat dikategorikan sebagai workover BD maupun NBD.', children:[
+        {code:'D1.a', name:'Perekahan Formasi (Fracturing)', desc:'Pemompaan di atas tekanan rekah pada layer yang sudah diproduksikan (existing producing layer).'},
+        {code:'D1.b', name:'Perubahan Sistem Lifting — Sewa Artificial Lift', desc:'Implementasi metode produksi artificial lift dengan fasilitas sewa.'}
+      ]},
+      {code:'D2', name:'Perawatan Sumur (Well Services)', desc:'Pekerjaan perawatan sumur untuk mempertahankan produksi dan menjaga sumur tetap berproduksi.', children:[
+        {code:'D2.a', name:'Perbaikan Artificial Lift', desc:'Perbaikan alat artificial lift.'},
+        {code:'D2.b', name:'Perforasi Pada Lapisan Yang Sama', desc:'Additional perforation di lapisan yang sudah diproduksikan.'},
+        {code:'D2.c', name:'Perforasi Pada Interval Yang Sama (Reperforation)', desc:'Perforasi ulang pada interval yang sama.'},
+        {code:'D2.d', name:'Chemical Pumping / Injection', desc:'Pemompaan di bawah tekanan rekah.'},
+        {code:'D2.e', name:'Perbaikan/Penggantian Peralatan Sumur', desc:'Perbaikan atau penggantian peralatan sumur, di permukaan maupun bawah permukaan.'},
+        {code:'D2.f', name:'Perawatan Permukaan (Surface Maintenance)', desc:'Perawatan peralatan sumur di permukaan: wellhead, X-mass tree, valves, dll.'},
+        {code:'D2.g', name:'Perawatan Bawah Permukaan (Downhole Maintenance)', desc:'Perawatan peralatan sumur di bawah permukaan: tubing, scale/sand/fishing, dll.'},
+        {code:'D2.h', name:'Pengambilan Data Sumur', desc:'Pengambilan data sumur — BHP, Sonolog, Dynagraph.'}
+      ]},
+      {code:'D3', name:'Kegiatan Pra-Pengembangan', desc:'Kegiatan pra-proyek di tahap perencanaan, sebelum Tahap Kajian Lanjut. Masuk RKAP sebagai ABO; direview untuk finalisasi alokasi ABI/ABO jika mendapat Persetujuan Investasi sebelum tutup buku.', children:[
+        {code:'D3.a', name:'Survey GGRP', desc:'Survey akuisisi data geofisika (seismik/non-seismik), geologi lapangan, geokimia, dan sejenisnya.'},
+        {code:'D3.b', name:'Pengolahan Data Survey GGRP', desc:'Pengolahan data geofisika, geologi, geokimia, geomekanik, PVT, dan sejenisnya.'},
+        {code:'D3.c', name:'Studi GGRP', desc:'Studi Geology, Geophysics, Reservoir and Production untuk mendukung rencana pengembangan.'},
+        {code:'D3.d', name:'Survey Keteknikan', desc:'Survey geoteknikal/geofisikal untuk kondisi seabed dan daya dukung tanah.'},
+        {code:'D3.e', name:'EOR Study', desc:'Studi laboratorium, studi GGRP, tracer test, dll untuk mendukung usulan proyek EOR.'},
+        {code:'D3.f', name:'Pre-FEED', desc:'Kegiatan engineering yang diperlukan pada Tahap Seleksi.'},
+        {code:'D3.g', name:'Studi Kelayakan dan Preliminary Engineering', desc:'Studi/analisa kelayakan teknologi atau peralatan; engineering pendahuluan untuk studi awal proyek.'}
+      ]},
+      {code:'D4', name:'Kegiatan Rutin Operasi Produksi', desc:'Kegiatan rutin yang berhubungan langsung dengan operasi produksi.', children:[
+        {code:'D4.a', name:'Inspeksi Rutin Fasilitas dan/atau Peralatan', desc:'Inspeksi reguler sesuai aturan/standar: rekualifikasi anjungan, pengetesan safety shutdown system, pemutakhiran PLO, dll.'},
+        {code:'D4.b', name:'Perawatan Fasilitas', desc:'Perawatan rutin dan penggantian suku cadang/consumable secara berkala, termasuk replacement in kind.'}
+      ]},
+      {code:'D5', name:'Kegiatan Paska Operasi (KPO)', desc:'Penutupan sumur permanen, penghentian pengoperasian, pembongkaran fasilitas, dan pemulihan lingkungan di WK.', children:[
+        {code:'D5.a', name:'Penyiapan dan Perencanaan Usulan KPO', desc:'Tahap Inisiasi KPO, Tahap Seleksi KPO, dan Tahap Kajian Lanjut KPO.'},
+        {code:'D5.b', name:'Penutupan Sumur (P&A)', desc:'Kegiatan penutupan sumur secara permanen.'},
+        {code:'D5.c', name:'Decommissioning', desc:'Pembongkaran dan pemindahan fasilitas produksi.'},
+        {code:'D5.d', name:'Pasca KPO', desc:'Disposal, pembersihan, pemulihan lingkungan, dan kegiatan lain pasca pelaksanaan KPO.'}
+      ]}
+    ]
+  }
+};
+
+function flatten(catKey){
+  var cat = DATA[catKey];
+  var out = [];
+  cat.items.forEach(function(it){
+    if(it.children){
+      it.children.forEach(function(c){ out.push({code:c.code, name:c.name, desc:c.desc, group:it.name}); });
+    } else {
+      out.push({code:it.code, name:it.name, desc:it.desc, group:null});
+    }
+  });
+  return out;
+}
+// Label kesimpulan besar per kategori, buat halaman hasil.
+// C dibebankan sebagai ABO juga (lihat Pedoman PUDW), tapi ditandai "Pra-Proyek"
+// karena tata kelolanya beda (Pre-FID/Pre-ID), bukan operasional rutin biasa.
+function groupLabel(catKey){
+  var map = {
+    A: 'ABI BD',
+    B: 'ABI NBD',
+    C: 'ABO (PRA-PROYEK)',
+    D: 'ABO'
+  };
+  return map[catKey] || catKey;
+}
+
+function findItem(code){
+  for(var k in DATA){
+    var res = null;
+    DATA[k].items.forEach(function(it){
+      if(it.code===code) res = it;
+      if(it.children) it.children.forEach(function(c){ if(c.code===code) res=c; });
+    });
+    if(res) return {item:res, catKey:k};
+  }
+  return null;
+}
+
+// ============================================================
+// STATE
+// ============================================================
+var state = {
+  tab:'wizard',
+  step:'nama',
+  stepHistory:[],
+  answers:{},
+  history:[]
+};
+
+function fmtUSD(n){
+  if(!n && n!==0) return '-';
+  return '$' + Number(n).toLocaleString('en-US');
+}
+function fmtDate(iso){
+  var d = new Date(iso);
+  return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+}
+function uid(){ return 'k'+Date.now()+Math.random().toString(16).slice(2,7); }
+
+// ---------- storage ----------
+// App ini dipakai di dua environment berbeda:
+//  1) sebagai artifact claude.ai       -> window.storage tersedia (async, Promise-based)
+//  2) sebagai file HTML biasa/standalone -> window.storage TIDAK ADA, pakai localStorage biasa
+// Kalau dua-duanya tidak ada, riwayat jalan in-memory saja untuk sesi ini (gagal diam-diam,
+// sesuai keputusan produk di PRD §5.3 — tidak ada error yang mengganggu alur wizard).
+//
+// PENTING (bug fatal 23 Juli 2026): di konteks browser yang dibatasi (preview file
+// iOS/Quick Look, private browsing ketat, webview tersandbox, dll), SEKADAR
+// MENGAKSES `window.localStorage` — bahkan cuma buat `typeof` — bisa langsung
+// melempar SecurityError. Kalau itu tidak ketangkep, seluruh skrip berhenti di
+// tengah jalan dan #view tetap kosong selamanya (persis gejala yang dilaporkan
+// user: header render karena itu HTML statis, tapi konten utama blank).
+// ATURAN WAJIB: SETIAP pengecekan window.storage / window.localStorage / API
+// browser modern lain (navigator.clipboard dst) HARUS dibungkus try/catch di
+// level pengecekannya sendiri, BUKAN cuma di operasi get/set-nya. Jangan pernah
+// tulis `typeof window.localStorage !== 'undefined'` telanjang lagi di file ini.
+var STORAGE_KEY = 'classifications';
+var DELETED_KEY = 'classifications_deleted_ids';
+
+// ---------- cloud sync (opsional, riwayat bersama lintas user) ----------
+// Isi CLOUD_SYNC_URL setelah deploy Apps Script Web App-nya sendiri — lihat
+// docs/setup-cloud-sync.md. Kalau dikosongkan (default), app jalan 100% offline
+// seperti sebelumnya, tidak ada satu pun fungsi di bawah ini yang memanggil network.
+// Semua operasi di sini best-effort & gagal diam-diam (konsisten dengan filosofi
+// storageGet/storageSet di atas) — riwayat LOKAL selalu jadi sumber kebenaran utama,
+// cloud cuma lapisan tambahan supaya riwayat kelihatan lintas HP/user.
+// "Hapus" di riwayat SENGAJA cuma lokal (tidak menghapus dari sheet bersama) —
+// supaya satu user tidak bisa menghapus riwayat orang lain tanpa sadar. Id yang
+// dihapus dicatat di DELETED_KEY biar tidak muncul lagi tiap kali sync ulang dari
+// cloud di perangkat yang sama.
+var CLOUD_SYNC_URL = 'https://script.google.com/macros/s/AKfycbzlJKA4DKt2-GGMj-uN9n6r-L8aLy4T8fVOgaXxvhGTqQJe07CaHmJNGL9-JwUsLgA-tg/exec';
+var CLOUD_SYNC_TOKEN = 'Draupnir19@ptm';
+
+function cloudSyncConfigured(){
+  try{ return !!(CLOUD_SYNC_URL && typeof fetch !== 'undefined'); }catch(e){ return false; }
+}
+
+function getDeletedIds(){
+  try{
+    if(typeof window.localStorage !== 'undefined' && window.localStorage){
+      var raw = null;
+      try{ raw = window.localStorage.getItem(DELETED_KEY); }catch(e2){ raw = null; }
+      try{ return raw ? JSON.parse(raw) : []; }catch(e3){ return []; }
+    }
+  }catch(e){ /* localStorage diblokir di konteks ini, lanjut tanpa daftar hapus */ }
+  return [];
+}
+function addDeletedId(id){
+  try{
+    if(typeof window.localStorage !== 'undefined' && window.localStorage){
+      var list = getDeletedIds();
+      list.push(id);
+      try{ window.localStorage.setItem(DELETED_KEY, JSON.stringify(list)); }catch(e2){}
+    }
+  }catch(e){ /* localStorage diblokir, penghapusan tetap jalan, cuma tidak diingat lintas-sesi */ }
+}
+
+function cloudPush(entry){
+  try{
+    if(!cloudSyncConfigured()) return;
+    fetch(CLOUD_SYNC_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ token: CLOUD_SYNC_TOKEN, entry: entry })
+    }).catch(function(){ /* offline atau server bermasalah, riwayat tetap aman di lokal */ });
+  }catch(e){ /* fetch tidak bisa diakses di konteks ini, lanjut tanpa cloud sync */ }
+}
+
+function cloudPullAndMerge(){
+  try{
+    if(!cloudSyncConfigured()) return;
+    var sep = CLOUD_SYNC_URL.indexOf('?')>-1 ? '&' : '?';
+    var url = CLOUD_SYNC_URL + sep + 'token=' + encodeURIComponent(CLOUD_SYNC_TOKEN);
+    fetch(url).then(function(res){ return res.json(); }).then(function(list){
+      if(!list || !list.length) return;
+      var deleted = getDeletedIds();
+      var byId = {};
+      state.history.forEach(function(h){ byId[h.id] = h; });
+      list.forEach(function(entry){
+        if(!entry || !entry.id) return;
+        if(deleted.indexOf(entry.id)>-1) return;
+        byId[entry.id] = entry;
+      });
+      var merged = [];
+      for(var k in byId){ merged.push(byId[k]); }
+      state.history = merged;
+      saveHistory();
+      // cloudPullAndMerge() jalan async di background dan bisa "landing" kapan saja
+      // (termasuk saat user lagi ngetik di step nama). syncCurrentStepInputs() WAJIB
+      // dipanggil sebelum render() di sini, persis pola yang sudah dipakai di semua
+      // handler lain — kalau tidak, ini bisa reintroduce bug render()-menghapus-input
+      // yang sudah pernah terjadi (lihat Riwayat Perubahan 22 Juli 2026 lanjutan 3).
+      try{ syncCurrentStepInputs(); }catch(e4){ /* belum ada step aktif (mis. masih di tab lain), aman diabaikan */ }
+      render();
+    }).catch(function(){ /* pull gagal (offline/server down), tetap pakai riwayat lokal apa adanya */ });
+  }catch(e){ /* fetch tidak bisa diakses di konteks ini, lanjut tanpa cloud sync */ }
+}
+
+function storageGet(key){
+  try{
+    if(typeof window.storage !== 'undefined' && window.storage){
+      return window.storage.get(key, false).then(function(res){
+        return res && res.value ? res.value : null;
+      }).catch(function(){ return null; });
+    }
+  }catch(e){ /* window.storage tidak bisa diakses di konteks ini, lanjut ke tier berikutnya */ }
+  try{
+    if(typeof window.localStorage !== 'undefined' && window.localStorage){
+      var v = null;
+      try{ v = window.localStorage.getItem(key); }catch(e2){ v = null; }
+      return Promise.resolve(v);
+    }
+  }catch(e){ /* localStorage diblokir di konteks ini (mis. preview file), lanjut ke fallback */ }
+  return Promise.resolve(null);
+}
+function storageSet(key, value){
+  try{
+    if(typeof window.storage !== 'undefined' && window.storage){
+      return window.storage.set(key, value, false).catch(function(){});
+    }
+  }catch(e){ /* window.storage tidak bisa diakses, lanjut ke tier berikutnya */ }
+  try{
+    if(typeof window.localStorage !== 'undefined' && window.localStorage){
+      try{ window.localStorage.setItem(key, value); }catch(e2){}
+      return Promise.resolve();
+    }
+  }catch(e){ /* localStorage diblokir, riwayat cuma jalan in-memory sesi ini */ }
+  return Promise.resolve();
+}
+function loadHistory(){
+  try{
+    storageGet(STORAGE_KEY).then(function(val){
+      try{ state.history = val ? JSON.parse(val) : []; }catch(e){ state.history=[]; }
+      render();
+      try{ cloudPullAndMerge(); }catch(e3){ /* sync opsional, tidak boleh ganggu boot */ }
+    }).catch(function(){ state.history=[]; render(); });
+  }catch(e){
+    // Safety net terakhir: apa pun yang terjadi di atas, app HARUS tetap render.
+    state.history = [];
+    render();
+  }
+}
+function saveHistory(){
+  storageSet(STORAGE_KEY, JSON.stringify(state.history));
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ t.classList.remove('show'); }, 1900);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(step){
+  state.stepHistory.push(state.step);
+  state.step = step;
+  render();
+}
+function goBack(){
+  if(state.stepHistory.length===0){ return; }
+  state.step = state.stepHistory.pop();
+  render();
+}
+function resetWizard(){
+  state.step = 'nama';
+  state.stepHistory = [];
+  state.answers = {};
+  state.formError = null;
+  render();
+}
+function switchTab(tab){
+  state.tab = tab;
+  if(tab==='wizard' && state.step==='hasil'){ /* keep result visible */ }
+  render();
+}
+
+function plannedPath(){
+  var cat = state.answers.category;
+  var hist = state.stepHistory.concat([state.step]);
+  var viaManual = hist.indexOf('jenis')>=0;
+  var base = ['nama','deteksi'];
+  if(viaManual){
+    base.push('jenis');
+    if(hist.indexOf('subabi')>=0) base.push('subabi');
+    else if(hist.indexOf('subabo')>=0) base.push('subabo');
+  }
+  if(cat==='D') return base.concat(['pilih','hasil']);
+  return base.concat(['pilih','governance','hasil']);
+}
+
+// ============================================================
+// RENDER — WIZARD STEPS
+// ============================================================
+function renderProgress(){
+  var path = plannedPath();
+  var idx = path.indexOf(state.step);
+  if(idx<0) idx=0;
+  var pct = Math.round(((idx+1)/path.length)*100);
+  return '' +
+  '<div class="progress-row"><span class="progress-label">Langkah '+(idx+1)+' dari '+path.length+'</span></div>' +
+  '<div class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div>';
+}
+
+function renderBack(){
+  if(state.stepHistory.length===0) return '';
+  return '<button class="backlink" data-action="back">&larr; Kembali</button>';
+}
+
+function stepNama(){
+  var a = state.answers;
+  var err = state.formError || {};
+  return renderBack() + renderProgress() +
+  '<h2 class="stepq">Kegiatan apa yang mau diklasifikasikan?</h2>' +
+  '<p class="stephint">Isi sedetail mungkin — dua field di bawah ini jadi dasar deteksi kategori otomatis di langkah berikutnya, jadi wajib diisi.</p>' +
+  '<div class="field'+(err.nama?' has-error':'')+'"><label>Nama Kegiatan / Proyek <span class="req">*</span></label>' +
+  '<input type="text" id="inpNama" placeholder="cth. Perubahan Lifting Method Sumur X-12" value="'+(a.nama||'')+'">' +
+  (err.nama
+    ? '<div class="error-msg">Wajib diisi — tanpa ini deteksi otomatis tidak bisa jalan.</div>'
+    : '<div class="unit">Ikuti kaidah <b>Bagaimana – Apa – Dimana (BAD)</b>. Contoh: "Perubahan (Bagaimana) Lifting Method (Apa) Sumur X-12 (Dimana)". Judul yang jelas mempermudah pencarian kata kunci nanti.</div>') +
+  '</div>' +
+  '<div class="field'+(err.deskripsi?' has-error':'')+'"><label>Latar Belakang <span class="req">*</span></label>' +
+  '<textarea id="inpDeskripsi" placeholder="Kenapa kegiatan ini perlu dilakukan? Masalah apa yang diselesaikan?">'+(a.deskripsi||'')+'</textarea>' +
+  (err.deskripsi
+    ? '<div class="error-msg">Wajib diisi — jadi salah satu sumber utama deteksi otomatis.</div>'
+    : '<div class="unit">Kaidah singkat: <b>Kondisi/Temuan &rarr; Dampak &rarr; Urgensi</b>. Contoh: "Hasil inspeksi rutin menemukan korosi pada pipa outlet separator, berisiko bocor dan berhenti produksi kalau tidak segera ditangani."</div>') +
+  '</div>' +
+  '<div class="field"><label>Manfaat utama proyek</label>' +
+  '<div class="chiprow">' +
+    '<button class="chip'+(a.benefitProyek==='produksi'?' active':'')+'" data-action="benefit_produksi">Menambah produksi</button>' +
+    '<button class="chip'+(a.benefitProyek==='mempertahankan'?' active':'')+'" data-action="benefit_mempertahankan">Mempertahankan produksi</button>' +
+    '<button class="chip'+(a.benefitProyek==='lpo'?' active':'')+'" data-action="benefit_lpo">Menghindari LPO</button>' +
+  '</div></div>' +
+  '<button class="btn primary full" data-action="mulai">Mulai Klasifikasi</button>';
+}
+
+// ============================================================
+// MESIN DETEKSI OTOMATIS (kata kunci)
+// ============================================================
+// Vanilla JS murni, tanpa library NLP eksternal (konsisten sama constraint
+// zero-dependency). Skoring bag-of-words + IDF ringan dari 49 leaf item,
+// plus boost dari "benefit proyek" dan "jenis aktivitas" yang diisi user.
+// INI SARAN, BUKAN KEPUTUSAN — selalu tampilkan sebagai hal yang bisa
+// ditolak user (lihat stepDeteksi). Jangan hapus tombol "pilih manual".
+var STOPWORDS = {
+  'dan':1,'atau':1,'yang':1,'untuk':1,'dari':1,'ke':1,'di':1,'pada':1,
+  'dengan':1,'adalah':1,'serta':1,'sebagai':1,'akan':1,'dapat':1,'tidak':1,
+  'ada':1,'ini':1,'itu':1,'oleh':1,'atas':1,'dalam':1,'juga':1,'per':1,
+  'investasi':1,'kegiatan':1,'proyek':1,'biaya':1,'kategori':1,
+  // 'equipment' sengaja di-stopword: kata ini generik (banyak item nyebut
+  // peralatan/equipment dalam bentuk apa pun), tapi kebetulan jadi kata KHAS
+  // di judul resmi B8 "Rotating Equipment Change Out". Kalau tidak di-stopword,
+  // query yang cuma nyebut "equipment" generik (misalnya "static equipment")
+  // ikut kebawa ke B8 padahal maksudnya kebalikannya. Lihat bug fatal 22 Juli 2026.
+  'equipment':1,
+  // 'power' juga di-stopword sama alasan dengan 'equipment': cuma muncul di SATU
+  // deskripsi resmi (B3 HSSE dan ESG, dalam frasa "low carbon power/heat"), tapi
+  // "power" itu kata yang sangat umum dipakai lintas konteks (power system,
+  // power plant, backup power, dst) yang kebanyakan TIDAK ada hubungannya sama
+  // HSSE. Lihat bug 22 Juli 2026 (lanjutan 10): "Upgrade Peralatan Obsolete SCADA
+  // Power System" salah kedeteksi jadi HSSE gara-gara kata ini.
+  'power':1
+};
+function tokenize(text){
+  return (text||'').toLowerCase()
+    .replace(/[^a-z0-9\s]/g,' ')
+    .split(/\s+/)
+    .filter(function(w){ return w.length>2 && !STOPWORDS[w]; });
+}
+var _kwIndexCache = null;
+function buildKeywordIndex(){
+  if(_kwIndexCache) return _kwIndexCache;
+  var records = [];
+  var byCode = {};
+  var df = {};
+  function addItem(it, catKey){
+    var uniq = {};
+    tokenize(it.name+' '+it.desc).forEach(function(t){ uniq[t]=true; });
+    Object.keys(uniq).forEach(function(t){ df[t]=(df[t]||0)+1; });
+    var rec = {catKey:catKey, item:it, tokens:uniq};
+    records.push(rec);
+    byCode[it.code] = rec;
+  }
+  ['A','B','C','D'].forEach(function(catKey){
+    DATA[catKey].items.forEach(function(it){
+      if(it.children && it.children.length){ it.children.forEach(function(c){ addItem(c, catKey); }); }
+      else { addItem(it, catKey); }
+    });
+  });
+  var N = records.length, idf = {};
+  Object.keys(df).forEach(function(t){ idf[t] = Math.log((N+1)/(df[t]+0.5)); });
+  _kwIndexCache = { records: records, byCode: byCode, idf: idf };
+  return _kwIndexCache;
+}
+// Skor relevansi kontekstual buat 1 item, dipakai di search box stepPilih.
+// Gabungan: exact substring match (bobot besar, biar cari kode/frasa persis tetap kena)
+// + overlap token berbobot IDF (biar kata yang beda tapi konteksnya nyambung tetap ketemu).
+function scoreItemForQuery(item, qRaw, qTokens){
+  var idx = buildKeywordIndex();
+  var rec = idx.byCode[item.code];
+  var score = 0;
+  var haystack = (item.name+' '+item.code+' '+(item.group||'')+' '+item.desc).toLowerCase();
+  if(qRaw && haystack.indexOf(qRaw)>-1) score += 10;
+  if(rec){
+    var expanded = expandWithSynonyms(qTokens);
+    expanded.forEach(function(t){ if(rec.tokens[t]) score += (idx.idf[t]||1); });
+    score += staticRotatingPenalty(expanded, rec);
+  }
+  return score;
+}
+// Kamus sinonim domain: jembatani bahasa lapangan sehari-hari ke istilah resmi
+// yang dipakai Fax 133 / Pedoman A6-001. Ini lookup manual, bukan model bahasa —
+// jangan overclaim ke user ini "AI paham konteks", ini tabel padanan kata yang
+// dikurasi manual. Tambah entri baru di sini kalau ada kata lapangan yang sering
+// dipakai tapi hasil pencarian/deteksinya kurang pas.
+var SYNONYMS = {
+  'pompa':['artificial','lift','peralatan'],
+  'rusak':['perbaikan','kerusakan'],
+  'bocor':['perbaikan','penggantian'],
+  'ganti':['penggantian','replacement'],
+  'mengganti':['penggantian','replacement'],
+  'alat':['peralatan'],
+  'tangki':['fasilitas','peralatan','integrity'],
+  'pipa':['piping','fasilitas'],
+  'ijin':['perizinan'],
+  'overhaul':['perbaikan','perawatan'],
+  'downtime':['lpo','disrupsi','kehandalan'],
+  'tutup':['penutupan','decommissioning'],
+  'bongkar':['decommissioning','pembongkaran'],
+  'renovasi':['perbaikan','perawatan'],
+  'cek':['inspeksi'],
+  'periksa':['inspeksi'],
+  'sewa':['sewa','artificial','lift'],
+  'sumuran':['sumur'],
+  'gudang':['fasilitas'],
+  // istilah Inggris yang lazim dipakai campur di lapangan migas — dijembatani
+  // ke padanan Indonesia yang benar-benar ada di data, bukan disamakan asal mirip.
+  'tank':['tangki','fasilitas','peralatan','integrity'],
+  'repair':['perbaikan','kerusakan'],
+  'leak':['kebocoran','perbaikan'],
+  'leakage':['kebocoran','perbaikan'],
+  'valve':['katup','peralatan'],
+  'maintenance':['perawatan'],
+  'inspect':['inspeksi'],
+  'replace':['penggantian'],
+  // Jembatan dua arah Inggris<->Indonesia buat istilah teknik yang lazim dipakai
+  // campur (kadang orang nulis Inggris, dokumen resminya Indonesia, atau
+  // sebaliknya). Ditambah 22 Juli 2026 (lanjutan 10) setelah "SCADA Power
+  // System" (Inggris) gagal ketemu B6 yang deskripsinya pakai "sistem"
+  // (Indonesia) — dua kata itu sebelumnya dianggap token yang beda sama sekali.
+  'system':['sistem'],
+  'sistem':['system'],
+  'process':['proses'],
+  'proses':['process'],
+  'control':['kontrol'],
+  'kontrol':['control'],
+  // 'static' TIDAK diberi sinonim ke 'rotating' atau 'equipment' (sudah stopword).
+  // Justru sebaliknya: static equipment dan rotating equipment itu DUA KELAS YANG
+  // SALING EKSKLUSIF secara teknik. Static diarahkan ke integrity/fasilitas biasa,
+  // dan skoring di bawah (lihat scoreStaticRotatingPenalty) SENGAJA menghukum item
+  // yang mengandung token 'rotating' kalau query menyebut 'static'. Jangan hapus
+  // penalti ini, itu fix langsung buat bug fatal 22 Juli 2026 (tank/static equipment
+  // salah kedeteksi jadi B8 Rotating Equipment Change Out).
+  'static':['integrity','fasilitas','peralatan']
+};
+// Penalti eksplisit static vs rotating — dua kelas equipment yang berlawanan
+// secara teknik, tidak bisa dijembatani lewat overlap kata biasa.
+function staticRotatingPenalty(qTokensRaw, rec){
+  var hasStatic = qTokensRaw.indexOf('static') > -1;
+  var hasRotating = qTokensRaw.indexOf('rotating') > -1;
+  if(hasStatic && !hasRotating && rec.tokens['rotating']) return -15;
+  if(hasRotating && !hasStatic && rec.tokens['static']) return -15;
+  return 0;
+}
+function expandWithSynonyms(tokens){
+  var out = tokens.slice();
+  tokens.forEach(function(t){ if(SYNONYMS[t]) out = out.concat(SYNONYMS[t]); });
+  return out;
+}
+// Nama Kegiatan menjelaskan AKSI yang diusulkan (Bagaimana-Apa-Dimana).
+// Latar Belakang sering menceritakan PEMICU/konteks (mis. "hasil inspeksi rutin
+// menemukan kebocoran..."), yang isinya bisa memuat kata dari kategori LAIN
+// (contoh: "inspeksi" muncul di Latar Belakang sebagai alasan, padahal aksi yang
+// diusulkan adalah "perbaikan"). Makanya Nama Kegiatan dikasih bobot lebih besar
+// supaya AKSI yang diusulkan yang menang, bukan kata yang cuma disebut sebagai
+// konteks/pemicu. Rasio 2:1 sudah diuji dengan beberapa skenario nyata (lihat
+// Riwayat Perubahan) — jangan turunkan ke 1:1 lagi, itu balik ke bug yang sama.
+// CATATAN: chip "Fungsi/DX" yang dulu ada di sini (boost +4 berdasarkan 435 data
+// historis, akurasi terbukti naik dari 62.5% ke 87.5%) DIHAPUS dari UI atas
+// permintaan Arief 22 Juli 2026 (simplifikasi tampilan). Data historisnya TETAP
+// tersimpan di docs/referensi/historis_klasifikasi_bd_nbd.tsv kalau suatu saat
+// mau dipakai lagi — analisis lengkapnya ada di Riwayat Perubahan lanjutan 8.
+// Kata kunci dari judul 435 usulan historis yang korelasinya kuat (>=85% satu arah,
+// n>=8). SENGAJA tidak masukkan kata yang polanya kebetulan/tidak general secara
+// semantik (mis. "small", "produksi" sendirian) — lihat riwayat percakapan 22 Juli
+// 2026 kenapa itu dibuang. Bobot ringan (bukan penentu tunggal), cuma nudge.
+var BD_KEYWORDS = ['development','pengembangan','pemboran','pengeboran','pembayaran'];
+var NBD_KEYWORDS = ['penggantian','upgrade','pengadaan','peralatan','fasilitas','pipa','peningkatan','substation'];
+// GATE konteks sumur buat kategori A. Kategori A ("Investasi BD Pengembangan")
+// per definisinya soal produksi/pengurasan/sumur — hampir semua itemnya (A1-A6)
+// menyebut sumur/workover/artificial lift/reservoir di deskripsinya. Tanpa gate
+// ini, kata umum yang KEBETULAN nempel di satu item A (mis. "refurbishment" di
+// A6 Field Reactivation) bisa menyeret proyek yang jelas-jelas TIDAK terkait
+// sumur sama sekali (contoh nyata: "Bridge Improvement" / perbaikan jembatan
+// akses, ini fasilitas permukaan biasa, bukan reaktivasi lapangan). Pola bug ini
+// sudah 3x kejadian dengan kata beda-beda (inspeksi->D4.a, equipment->B8,
+// refurbishment->A6) — gate ini benerin akar masalahnya buat kategori A secara
+// umum, bukan tambal kata per kata lagi. Diuji: tidak mengganggu kasus yang
+// memang benar konteks sumurnya (A2.c, A1 dengan kata "sumur"/"pemboran" dst).
+var WELL_CONTEXT_WORDS = ['sumur','workover','artificial','lift','reservoir','perforasi','pengurasan','recovery','eor','injeksi','well','pengeboran','pemboran'];
+
+var NAMA_WEIGHT = 2;
+var LATAR_WEIGHT = 1;
+function suggestClassification(nama, deskripsi, benefitProyek){
+  var namaTokens = expandWithSynonyms(tokenize(nama));
+  var deskTokens = expandWithSynonyms(tokenize(deskripsi));
+  if(namaTokens.length===0 && deskTokens.length===0 && !benefitProyek) return null;
+  var qSet = {};
+  namaTokens.forEach(function(t){ qSet[t]=(qSet[t]||0)+NAMA_WEIGHT; });
+  deskTokens.forEach(function(t){ qSet[t]=(qSet[t]||0)+LATAR_WEIGHT; });
+  var idx = buildKeywordIndex();
+  var qAllTokens = namaTokens.concat(deskTokens);
+  var hasWellContext = qAllTokens.some(function(t){ return WELL_CONTEXT_WORDS.indexOf(t) > -1; });
+  var wellGateOk = hasWellContext || benefitProyek==='produksi';
+  var best = null;
+  idx.records.forEach(function(rec){
+    var score = 0;
+    Object.keys(qSet).forEach(function(t){ if(rec.tokens[t]) score += (idx.idf[t]||1)*qSet[t]; });
+    score += staticRotatingPenalty(qAllTokens, rec);
+    if(rec.catKey==='A' && !wellGateOk) score -= 8;
+    if(benefitProyek==='produksi' && rec.catKey==='A') score += 3;
+    if(benefitProyek==='mempertahankan' && rec.catKey==='B') score += 3;
+    if(benefitProyek==='lpo' && rec.catKey==='B') score += 3;
+    // Nudge ringan dari kata kunci historis, cuma buat A/B (BD/NBD), tidak menyentuh C/D.
+    if(rec.catKey==='A' || rec.catKey==='B'){
+      qAllTokens.forEach(function(t){
+        if(rec.catKey==='A' && BD_KEYWORDS.indexOf(t)>-1) score += 1;
+        if(rec.catKey==='B' && NBD_KEYWORDS.indexOf(t)>-1) score += 1;
+      });
+    }
+    if(!best || score > best.score) best = {score:score, catKey:rec.catKey, item:rec.item};
+  });
+  if(!best || best.score <= 0) return null;
+  return best;
+}
+
+function stepDeteksi(){
+  var a = state.answers;
+  var suggestion = suggestClassification(a.nama||'', a.deskripsi||'', a.benefitProyek);
+  var html = renderBack() + renderProgress() + '<h2 class="stepq">Deteksi otomatis</h2>';
+  if(!suggestion){
+    html += '<p class="stephint">Belum cukup kata kunci untuk menebak. Kembali dan lengkapi nama/catatan, atau pilih kategori manual.</p>';
+    html += '<button class="btn primary full" data-action="pilih_manual">Pilih ABI/ABO Manual</button>';
+    return html;
+  }
+  var cat = DATA[suggestion.catKey];
+  html += '<p class="stephint">Berdasarkan kata kunci yang Anda isi. Ini <b>saran awal</b>, bukan keputusan final — cek deskripsinya dulu.</p>';
+  html += '<style>.tagplate{--cat-color:'+cat.color+'}</style>';
+  html += '<div class="tagplate">' +
+    '<span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>' +
+    '<div class="grouplabel">'+groupLabel(suggestion.catKey)+'</div>' +
+    '<div class="catname">'+cat.title+'</div>' +
+    '<div class="subcode">'+suggestion.item.code+' — '+suggestion.item.name+'</div>' +
+    '<div class="desc">'+suggestion.item.desc+'</div>' +
+    '</div>';
+  html += '<button class="btn primary full" data-action="terima_saran" data-code="'+suggestion.item.code+'">Instan — pakai saran ini</button>';
+  html += '<button class="btn ghost full" style="margin-top:10px" data-action="pilih_manual">Bukan ini, pilih ABI/ABO manual</button>';
+  return html;
+}
+
+function stepJenis(){
+  return renderBack() + renderProgress() +
+  '<h2 class="stepq">Ini termasuk ABI atau ABO?</h2>' +
+  '<p class="stephint">Pilih yang paling sesuai dulu — sub-kategorinya ditanya di langkah berikutnya.</p>' +
+  choiceCard('ABI','var(--accent-a)','ABI — Anggaran Biaya Investasi','Investasi BD atau NBD yang butuh persetujuan FID / Pre-FID / Pre-ID.','jenis_abi') +
+  choiceCard('ABO','var(--accent-d)','ABO — Anggaran Biaya Operasi','Operasional yang sedang berjalan, atau biaya pra-proyek (survey/FEED) yang dibebankan ke ABO.','jenis_abo');
+}
+
+function stepSubAbi(){
+  return renderBack() + renderProgress() +
+  '<h2 class="stepq">Menambah atau mempertahankan produksi?</h2>' +
+  '<p class="stephint">Ini menentukan apakah masuk ABI BD atau ABI NBD.</p>' +
+  choiceCard('BD','var(--accent-a)','Menambah produksi','Ada penambahan produksi/pengurasan yang bisa dijustifikasi keekonomiannya (profit).','sub_bd') +
+  choiceCard('NBD','var(--accent-b)','Mempertahankan produksi','HSSE, ESG, keandalan operasi, dukungan operasi, integritas — bukan penambahan produksi langsung.','sub_nbd');
+}
+
+function stepSubAbo(){
+  return renderBack() + renderProgress() +
+  '<h2 class="stepq">Ini pra-proyek atau operasional berjalan?</h2>' +
+  '<p class="stephint">Ini menentukan apakah masuk ABO Pra-Proyek atau ABO Umum.</p>' +
+  choiceCard('C','var(--accent-c)','Pra-Proyek','Survey, FEED, perizinan, penyiapan lahan — sebelum ada keputusan investasi (FID).','sub_c') +
+  choiceCard('D','var(--accent-d)','Operasional / Perawatan Rutin','Terkait langsung operasi produksi berjalan — tidak perlu persetujuan investasi baru.','sub_d');
+}
+
+function choiceCard(tagText,color,title,desc,action){
+  return '<button class="choice-card" data-action="'+action+'">' +
+    '<span class="tag" style="background:'+color+'22;color:'+color+';border:1px solid '+color+'55">'+tagText+'</span>' +
+    '<span class="body"><b>'+title+'</b><span>'+desc+'</span></span>' +
+    '</button>';
+}
+
+function stepPilih(){
+  var catKey = state.answers.category;
+  var cat = DATA[catKey];
+  var flat = flatten(catKey);
+  var q = (state.pilihFilter || '').trim();
+  var isSearching = q.length > 0;
+  var filtered = flat;
+
+  if(isSearching){
+    var qLower = q.toLowerCase();
+    var qTokens = tokenize(q);
+    filtered = flat
+      .map(function(x){ return { item:x, score: scoreItemForQuery(x, qLower, qTokens) }; })
+      .filter(function(r){ return r.score > 0; })
+      .sort(function(a,b){ return b.score - a.score; })
+      .map(function(r){ return r.item; });
+  }
+
+  var html = renderBack() + renderProgress() +
+  '<h2 class="stepq">Pilih kegiatan spesifik</h2>' +
+  '<p class="stephint">Kategori: <b style="color:'+cat.color+'">'+cat.title+'</b></p>';
+
+  if(flat.length>8){
+    html += '<div class="search-box"><input type="text" id="inpFilter" placeholder="Cari kegiatan... (boleh bahasa sehari-hari, tidak harus istilah resmi)" value="'+q+'"></div>';
+  }
+
+  var lastGroup = undefined;
+  if(filtered.length===0){
+    html += '<div class="empty"><div class="glyph">∅</div><p>Tidak ada kegiatan yang cocok. Coba kata kunci lain, atau ceritakan dengan kalimat singkat.</p></div>';
+  }
+  filtered.forEach(function(x){
+    // grouping per parent kode cuma ditampilkan waktu browsing biasa (tanpa query),
+    // karena saat searching urutannya berdasar relevansi, bukan urutan taksonomi.
+    if(!isSearching && x.group !== lastGroup){
+      html += '<div class="group-label">'+(x.group||cat.title)+'</div>';
+      lastGroup = x.group;
+    }
+    html += '<button class="choice-card" data-action="pilih_item" data-code="'+x.code+'">' +
+      '<span class="tag mono" style="background:'+cat.color+'22;color:'+cat.color+';border:1px solid '+cat.color+'55">'+x.code.replace(catKey,'')+'</span>' +
+      '<span class="body"><b>'+x.name+'</b><span>'+x.desc+'</span></span>' +
+      '</button>';
+  });
+  return html;
+}
+
+function stepGovernance(){
+  var a = state.answers;
+  var cat = DATA[a.category];
+  return renderBack() + renderProgress() +
+  '<h2 class="stepq">Cek kelengkapan tata kelola</h2>' +
+  '<p class="stephint">Berdasarkan Pedoman A6-001/PHE11000/2023-S9 Rev.2, Bab I.B.3 &amp; Bab II.B.1.h — menentukan apakah kegiatan ini perlu proses Pre-FID/Pre-ID.</p>' +
+  '<div class="field"><label>Apakah termasuk Early Work (pekerjaan awal sebelum FID)?</label>' +
+  '<div class="toggle-row">' +
+    '<button class="toggle-btn'+(a.earlyWork===true?' active':'')+'" data-action="ew_yes">Ya</button>' +
+    '<button class="toggle-btn'+(a.earlyWork===false?' active':'')+'" data-action="ew_no">Tidak</button>' +
+  '</div></div>' +
+  '<div class="field"><label>Estimasi nilai pra-proyek terkait (survey / FEED / BED)</label>' +
+  '<input type="number" id="inpNilai" placeholder="0" value="'+(a.nilaiPraProyek||'')+'" inputmode="numeric">' +
+  '<div class="unit">Dalam USD. Untuk cek kebutuhan Pre-FID/Pre-ID. Kosongkan jika belum ada estimasi.</div></div>' +
+  '<div class="field"><label>Estimasi nilai investasi total proyek (kalau sudah ada)</label>' +
+  '<input type="number" id="inpNilaiInvestasi" placeholder="0" value="'+(a.nilaiInvestasi||'')+'" inputmode="numeric">' +
+  '<div class="unit">Dalam USD. Beda dari nilai pra-proyek di atas — ini nilai investasi keseluruhan, dipakai untuk cek tingkat kewenangan persetujuan FID (SK Kpts-015/PHE00000/2023-S0). Kosongkan jika belum ada estimasi.</div></div>' +
+  '<button class="btn primary full" data-action="hitung_governance">Lihat Hasil</button>' +
+  '<button class="skiplink" data-action="skip_governance">Lewati, lihat hasil tanpa cek ini</button>';
+}
+
+function computeFlags(){
+  var a = state.answers;
+  var nilai = parseFloat(a.nilaiPraProyek);
+  var hasNilai = !isNaN(nilai);
+  var earlyWork = a.earlyWork===true;
+  var hasEW = a.earlyWork===true || a.earlyWork===false;
+  var needPreFid = earlyWork || (hasNilai && nilai > 1000000);
+  var needKomisaris = needPreFid && hasNilai && nilai > 500000000;
+  return {
+    hasData: hasEW || hasNilai,
+    earlyWork: earlyWork, hasEW: hasEW,
+    nilai: hasNilai ? nilai : null,
+    needPreFid: needPreFid,
+    needKomisaris: needKomisaris
+  };
+}
+
+// Tingkat kewenangan persetujuan Investasi (FID), beda dari Pre-FID/Pre-ID di atas.
+// Sumber: SK Kpts-015/PHE00000/2023-S0 tentang Ambang Batas Nilai Kewenangan
+// Persetujuan Investasi di Lingkungan Subholding Upstream, 11 Okt 2023.
+// CATATAN BATAS: SK ini ditranskrip manual oleh product owner (bukan dari PDF
+// yang diverifikasi ulang oleh siapa pun), dan batas persis di titik potong
+// (30jt/300jt/500jt) tidak dikonfirmasi inklusif di sisi mana. Asumsi di bawah
+// pakai ">=" untuk batas bawah tiap tingkat berikutnya. Kalau nanti PDF SK asli
+// didapat, cross-check ulang titik potong ini dan hapus catatan ini.
+var THRESHOLD_TIERS = [
+  { max: 30000000, tier:'regional', label:'Threshold Regional', approver:'Direktur Utama Anak Perusahaan Hulu (APH)' },
+  { max: 300000000, tier:'shu-komite', label:'Threshold Subholding Upstream (SHU)', approver:'Komite Investasi PHE' },
+  { max: 500000000, tier:'shu-boc', label:'Threshold Subholding Upstream (SHU)', approver:'Direktur Utama SHU, dengan rekomendasi Dewan Komisaris (BOC) PHE' },
+  { max: Infinity, tier:'shu-holding', label:'Threshold Subholding Upstream (SHU)', approver:'Direktur Utama SHU, dengan rekomendasi Dewan Komisaris (BOC) PHE, dan konsultasi Dewan Komisaris (BOC) Holding' }
+];
+function computeThreshold(){
+  var a = state.answers;
+  var nilai = parseFloat(a.nilaiInvestasi);
+  if(isNaN(nilai)) return null;
+  for(var i=0;i<THRESHOLD_TIERS.length;i++){
+    if(nilai < THRESHOLD_TIERS[i].max) return { nilai: nilai, tier: THRESHOLD_TIERS[i] };
+  }
+  return { nilai: nilai, tier: THRESHOLD_TIERS[THRESHOLD_TIERS.length-1] };
+}
+
+// Kalimat sintesis penutup — dipakai di kartu hasil DAN di teks yang disalin,
+// biar dua-duanya konsisten kalau formula di atas berubah.
+function buildKesimpulan(found, cat, flags, threshold, a){
+  var item = found.item;
+  var parts = [];
+  parts.push('Kegiatan '+(a.nama? '"'+a.nama+'" ' : '')+'termasuk <b>'+groupLabel(found.catKey)+'</b>, kode <b>'+item.code+'</b> ('+item.name+').');
+  if(a.category==='D'){
+    parts.push('Dibebankan sebagai Anggaran Biaya Operasi, tidak memerlukan Persetujuan Investasi/FID.');
+  } else if(flags && flags.hasData){
+    parts.push((flags.needPreFid?'Perlu':'Tidak perlu')+' proses Pre-FID/Pre-ID'+(flags.needKomisaris?', dan perlu konsultasi Dewan Komisaris Pertamina (Persero) karena nilai pra-proyek di atas USD 500 Juta':'')+'.');
+  }
+  if(threshold){
+    parts.push('Untuk persetujuan FID, masuk '+threshold.tier.label+', disetujui oleh '+threshold.tier.approver+'.');
+  }
+  parts.push('Ini kesimpulan awal — tetap konfirmasikan ke Koordinator Stream Bisnis/Investasi sebelum dituangkan ke dokumen resmi.');
+  return parts.join(' ');
+}
+
+function stepHasil(){
+  var a = state.answers;
+  var found = findItem(a.itemCode);
+  if(!found){ return '<div class="empty"><div class="glyph">!</div><p>Data kegiatan tidak ditemukan. Silakan mulai ulang.</p></div><button class="btn primary full" data-action="baru">Klasifikasi Baru</button>'; }
+  var item = found.item, cat = DATA[found.catKey];
+  var flags = (a.category!=='D') ? computeFlags() : null;
+  var threshold = (a.category!=='D') ? computeThreshold() : null;
+
+  var html = '<style>.tagplate{--cat-color:'+cat.color+'}</style>';
+  html += '<div class="tagplate">' +
+    '<span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>' +
+    '<div class="grouplabel">'+groupLabel(found.catKey)+'</div>' +
+    '<div class="catname">'+cat.title+'</div>' +
+    '<div class="subcode">'+item.code+' — '+item.name+'</div>' +
+    '<div class="desc">'+item.desc+'</div>' +
+    '</div>';
+
+  if(a.category==='D'){
+    html += '<div class="note">Kegiatan operasional — dibebankan sebagai Anggaran Biaya Operasi (ABO). Tidak memerlukan Persetujuan Investasi/FID.</div>';
+  } else if(flags){
+    html += '<div class="flagbox"><h3>Status Tata Kelola</h3>';
+    if(!flags.hasData){
+      html += '<div class="flagitem"><span class="flagdot info">i</span><span>Belum ada data Early Work / nilai investasi. Lengkapi untuk mengecek kebutuhan Pre-FID/Pre-ID.</span></div>';
+    } else {
+      html += '<div class="flagitem"><span class="flagdot '+(flags.needPreFid?'yes':'no')+'">'+(flags.needPreFid?'!':'✓')+'</span><span><b>'+(flags.needPreFid?'Perlu':'Tidak wajib')+' proses Pre-FID/Pre-ID</b> sebelum FID diajukan.</span></div>';
+      html += '<div class="flagitem"><span class="flagdot '+(flags.needKomisaris?'yes':'no')+'">'+(flags.needKomisaris?'!':'✓')+'</span><span><b>'+(flags.needKomisaris?'Perlu':'Tidak perlu')+' konsultasi Dewan Komisaris PT Pertamina (Persero)</b> — berlaku untuk usulan Pre-FID/Pre-ID di atas USD 500 Juta.</span></div>';
+    }
+    html += '<div class="flagitem"><span class="flagdot info">i</span><span>Revisi Persetujuan Investasi wajib diajukan jika realisasi biaya bertambah &gt;10% dari anggaran, atau ada penambahan ruang lingkup.</span></div>';
+    html += '<div class="flagitem"><span class="flagdot info">i</span><span>Laporan Project Closing wajib disampaikan paling lambat 6 bulan setelah proyek selesai.</span></div>';
+    html += '</div>';
+
+    html += '<div class="flagbox"><h3>Tingkat Kewenangan Persetujuan Investasi (FID)</h3>';
+    if(!threshold){
+      html += '<div class="flagitem"><span class="flagdot info">i</span><span>Belum ada estimasi nilai investasi total. Isi di langkah sebelumnya untuk cek tingkat kewenangan (Threshold).</span></div>';
+    } else {
+      html += '<div class="flagitem"><span class="flagdot info">!</span><span><b>'+threshold.tier.label+'</b><br>Persetujuan oleh: '+threshold.tier.approver+'<br>Nilai investasi: '+fmtUSD(threshold.nilai)+'</span></div>';
+    }
+    html += '<div class="flagitem"><span class="flagdot info">i</span><span>Sumber: SK Kpts-015/PHE00000/2023-S0, Ambang Batas Nilai Kewenangan Persetujuan Investasi, 11 Okt 2023. Titik potong nilai (batas persis USD 30 Juta/300 Juta/500 Juta) belum dikonfirmasi ke dokumen SK asli — cross-check sebelum dipakai untuk keputusan final.</span></div>';
+    html += '</div>';
+  }
+
+  html += '<div class="note" style="border-left:2px solid var(--accent-a)">Ini klasifikasi awal berbasis aturan. Klasifikasi final atas BD/Non-BD tetap ditentukan oleh Koordinator Stream Bisnis/Investasi terkait (Pedoman Bab I.B.2.a) — konfirmasikan sebelum dituangkan ke MOC atau usulan RKAP.</div>';
+
+  html += '<div class="flagbox" style="border-color:var(--cat-color, var(--accent-a))"><h3>Kesimpulan</h3>' +
+    '<p style="font-size:var(--fs-2);line-height:1.6;margin:0">' + buildKesimpulan(found, cat, flags, threshold, a) + '</p></div>';
+
+  html += '<div class="refbox">Ref: Fax No.133/PHE20000/2022-S0, Lampiran<br>Pedoman A6-001/PHE11000/2023-S9 Rev.2, Bab I &amp; II<br>SK Kpts-015/PHE00000/2023-S0 (Threshold Kewenangan)</div>';
+
+  html += '<div class="btnrow">' +
+    '<button class="btn primary" data-action="simpan">Simpan ke Riwayat</button>' +
+    '<button class="btn" data-action="salin">Salin Hasil</button>' +
+    '</div>' +
+    '<button class="btn ghost full" style="margin-top:10px" data-action="baru">Klasifikasi Baru</button>';
+
+  return html;
+}
+
+function buildResultText(){
+  var a = state.answers;
+  var found = findItem(a.itemCode);
+  if(!found) return '';
+  var item = found.item, cat = DATA[found.catKey];
+  var flags = (a.category!=='D') ? computeFlags() : null;
+  var threshold = (a.category!=='D') ? computeThreshold() : null;
+  var lines = [];
+  lines.push('KLASIFIKASI KEGIATAN INVESTASI');
+  lines.push('Kesimpulan: '+groupLabel(found.catKey));
+  if(a.nama) lines.push('Nama Kegiatan: '+a.nama);
+  lines.push('Kategori: '+item.code+' — '+cat.title+(found.item.group? ' > '+found.item.group : ''));
+  lines.push('Kegiatan: '+item.name);
+  lines.push('Deskripsi: '+item.desc);
+  if(flags && flags.hasData){
+    lines.push('Perlu Pre-FID/Pre-ID: '+(flags.needPreFid?'Ya':'Tidak'));
+    lines.push('Perlu Konsultasi Dewan Komisaris: '+(flags.needKomisaris?'Ya':'Tidak'));
+  }
+  if(threshold){
+    lines.push('Tingkat Kewenangan Persetujuan FID: '+threshold.tier.label+' — '+threshold.tier.approver+' (nilai investasi '+fmtUSD(threshold.nilai)+')');
+  }
+  lines.push('');
+  lines.push(buildKesimpulan(found, cat, flags, threshold, a).replace(/<\/?b>/g, ''));
+  lines.push('Referensi: Fax No.133/PHE20000/2022-S0; Pedoman A6-001/PHE11000/2023-S9 Rev.2; SK Kpts-015/PHE00000/2023-S0');
+  lines.push('Tanggal: '+fmtDate(new Date().toISOString()));
+  return lines.join('\n');
+}
+
+// ============================================================
+// RENDER — HISTORY TAB
+// ============================================================
+function renderHistory(){
+  var syncHint = '';
+  if(cloudSyncConfigured()){
+    syncHint = '<p class="stephint" style="margin-bottom:14px">Riwayat ini tersinkron otomatis dengan tim (server bersama). Hapus hanya berlaku di perangkat ini.</p>';
+  }
+  if(state.history.length===0){
+    return syncHint + '<div class="empty"><div class="glyph">R</div><p>Belum ada klasifikasi tersimpan.<br>Selesaikan sebuah klasifikasi lalu tekan "Simpan ke Riwayat".</p></div>';
+  }
+  var sorted = state.history.slice().sort(function(x,y){ return new Date(y.savedAt)-new Date(x.savedAt); });
+  var html = syncHint;
+  sorted.forEach(function(h){
+    var cat = DATA[h.catKey];
+    html += '<div class="histcard">' +
+      '<span class="codechip" style="background:'+cat.color+'22;color:'+cat.color+'">'+h.itemCode+'</span>' +
+      '<div class="info"><b>'+(h.nama||h.itemName)+'</b><span>'+h.itemName+' · '+cat.short+'</span><span class="date">'+fmtDate(h.savedAt)+'</span></div>' +
+      '<button class="del" data-action="hapus" data-id="'+h.id+'">&times;</button>' +
+      '</div>';
+  });
+  return html;
+}
+
+// ============================================================
+// RENDER — REFERENCE TAB
+// ============================================================
+function renderReference(){
+  var html = '<p class="stephint" style="margin-bottom:14px">Daftar lengkap kategori dari Lampiran Fax No.133/PHE20000/2022-S0.</p>';
+  ['A','B','C','D'].forEach(function(k){
+    var cat = DATA[k];
+    html += '<details class="refcat"><summary>' +
+      '<span class="tag" style="background:'+cat.color+'22;color:'+cat.color+'">'+k+'</span>' +
+      '<span><b>'+cat.title+'</b><span>'+cat.items.length+' kategori kegiatan</span></span>' +
+      '</summary><div class="items">';
+    cat.items.forEach(function(it){
+      html += '<div class="refitem"><span class="rcode">'+it.code+'</span><b>'+it.name+'</b><p>'+it.desc+'</p></div>';
+      if(it.children){
+        it.children.forEach(function(c){
+          html += '<div class="refitem" style="padding-left:12px"><span class="rcode">'+c.code+'</span><b>'+c.name+'</b><p>'+c.desc+'</p></div>';
+        });
+      }
+    });
+    html += '</div></details>';
+  });
+  return html;
+}
+
+// ============================================================
+// MAIN RENDER
+// ============================================================
+function render(){
+  var view = document.getElementById('view');
+  var html = '';
+  if(state.tab==='wizard'){
+    if(state.step==='nama') html = stepNama();
+    else if(state.step==='deteksi') html = stepDeteksi();
+    else if(state.step==='jenis') html = stepJenis();
+    else if(state.step==='subabi') html = stepSubAbi();
+    else if(state.step==='subabo') html = stepSubAbo();
+    else if(state.step==='pilih') html = stepPilih();
+    else if(state.step==='governance') html = stepGovernance();
+    else if(state.step==='hasil') html = stepHasil();
+  } else if(state.tab==='history'){
+    html = renderHistory();
+  } else if(state.tab==='reference'){
+    html = renderReference();
+  }
+  view.innerHTML = html;
+
+  document.querySelectorAll('nav.bottomnav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-nav')===state.tab);
+  });
+
+  var f = document.getElementById('inpFilter');
+  if(f){ f.focus(); var v=f.value; f.value=''; f.value=v; f.oninput = function(){ state.pilihFilter = f.value; render(); }; }
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+// Field teks (input/textarea) menyimpan nilainya di DOM, bukan di state.answers,
+// sampai user pindah step. Kalau ada tombol (chip/toggle) yang cuma render()
+// ulang TANPA pindah step, seluruh view di-replace via innerHTML dan field yang
+// lagi diisi (belum sempat "commit") ikut hilang. Fungsi ini commit dulu field
+// yang lagi terlihat sebelum render() ulang. WAJIB dipanggil di setiap handler
+// yang render() di tempat (bukan goTo()) selama masih ada input teks di step itu.
+function syncCurrentStepInputs(){
+  var elNama = document.getElementById('inpNama');
+  if(elNama) state.answers.nama = elNama.value;
+  var elDesk = document.getElementById('inpDeskripsi');
+  if(elDesk) state.answers.deskripsi = elDesk.value;
+  var elNilai = document.getElementById('inpNilai');
+  if(elNilai) state.answers.nilaiPraProyek = elNilai.value===''? undefined : parseFloat(elNilai.value);
+  var elNilaiInv = document.getElementById('inpNilaiInvestasi');
+  if(elNilaiInv) state.answers.nilaiInvestasi = elNilaiInv.value===''? undefined : parseFloat(elNilaiInv.value);
+}
+
+document.getElementById('app').addEventListener('click', function(e){
+  var el = e.target.closest('[data-action]');
+  if(!el) return;
+  var action = el.getAttribute('data-action');
+
+  if(action==='mulai'){
+    syncCurrentStepInputs();
+    var errs = {};
+    if(!state.answers.nama || !state.answers.nama.trim()) errs.nama = true;
+    if(!state.answers.deskripsi || !state.answers.deskripsi.trim()) errs.deskripsi = true;
+    if(Object.keys(errs).length){ state.formError = errs; render(); }
+    else { state.formError = null; goTo('deteksi'); }
+  } else if(action==='back'){
+    goBack();
+  } else if(action==='benefit_produksi'){
+    syncCurrentStepInputs();
+    state.answers.benefitProyek = (state.answers.benefitProyek==='produksi') ? undefined : 'produksi'; render();
+  } else if(action==='benefit_mempertahankan'){
+    syncCurrentStepInputs();
+    state.answers.benefitProyek = (state.answers.benefitProyek==='mempertahankan') ? undefined : 'mempertahankan'; render();
+  } else if(action==='benefit_lpo'){
+    syncCurrentStepInputs();
+    state.answers.benefitProyek = (state.answers.benefitProyek==='lpo') ? undefined : 'lpo'; render();
+  } else if(action==='terima_saran'){
+    var scode = el.getAttribute('data-code');
+    var sfound = findItem(scode);
+    state.answers.category = sfound.catKey;
+    state.answers.itemCode = scode;
+    state.answers.itemName = sfound.item.name;
+    goTo('hasil');
+  } else if(action==='pilih_manual'){
+    goTo('jenis');
+  } else if(action==='jenis_abi'){
+    goTo('subabi');
+  } else if(action==='jenis_abo'){
+    goTo('subabo');
+  } else if(action==='sub_bd'){
+    state.answers.category='A'; goTo('pilih');
+  } else if(action==='sub_nbd'){
+    state.answers.category='B'; goTo('pilih');
+  } else if(action==='sub_c'){
+    state.answers.category='C'; goTo('pilih');
+  } else if(action==='sub_d'){
+    state.answers.category='D'; goTo('pilih');
+  } else if(action==='pilih_item'){
+    var code = el.getAttribute('data-code');
+    var found = findItem(code);
+    state.answers.itemCode = code;
+    state.answers.itemName = found.item.name;
+    state.pilihFilter = '';
+    if(state.answers.category==='D'){ goTo('hasil'); } else { goTo('governance'); }
+  } else if(action==='ew_yes'){
+    syncCurrentStepInputs();
+    state.answers.earlyWork = true; render();
+  } else if(action==='ew_no'){
+    syncCurrentStepInputs();
+    state.answers.earlyWork = false; render();
+  } else if(action==='hitung_governance'){
+    syncCurrentStepInputs();
+    goTo('hasil');
+  } else if(action==='skip_governance'){
+    goTo('hasil');
+  } else if(action==='simpan'){
+    var found2 = findItem(state.answers.itemCode);
+    var entry = {
+      id: uid(),
+      nama: state.answers.nama || '',
+      itemCode: state.answers.itemCode,
+      itemName: found2.item.name,
+      catKey: found2.catKey,
+      flags: state.answers.category!=='D' ? computeFlags() : null,
+      savedAt: new Date().toISOString()
+    };
+    state.history.push(entry);
+    saveHistory();
+    cloudPush(entry);
+    showToast('Tersimpan ke riwayat');
+  } else if(action==='salin'){
+    var txt = buildResultText();
+    var clipboardOk = false;
+    try{ clipboardOk = !!(navigator.clipboard && navigator.clipboard.writeText); }catch(e){ clipboardOk = false; }
+    if(clipboardOk){
+      navigator.clipboard.writeText(txt).then(function(){ showToast('Disalin ke clipboard'); }).catch(function(){ showToast('Gagal menyalin'); });
+    } else {
+      showToast('Clipboard tidak tersedia');
+    }
+  } else if(action==='baru'){
+    resetWizard();
+  } else if(action==='hapus'){
+    var id = el.getAttribute('data-id');
+    state.history = state.history.filter(function(h){ return h.id!==id; });
+    saveHistory();
+    addDeletedId(id);
+    render();
+  }
+});
+
+document.querySelectorAll('nav.bottomnav button').forEach(function(b){
+  b.addEventListener('click', function(){ switchTab(b.getAttribute('data-nav')); });
+});
+
+// Jaring pengaman terakhir: apa pun yang error di proses boot (termasuk hal yang
+// belum kepikiran sekarang), #view TIDAK BOLEH kosong selamanya seperti bug fatal
+// 23 Juli 2026. loadHistory() sendiri sudah punya try/catch internal (lihat
+// definisinya), ini lapisan luar tambahan kalau ternyata ada exception lain
+// yang lolos sebelum sempat masuk ke situ.
+try{
+  loadHistory();
+}catch(e){
+  try{ state.history = []; render(); }catch(e2){ /* kalau render() sendiri yang gagal, sudah di luar jangkauan perbaikan JS */ }
+}
+})();
+</script>
+</body>
+</html>
