@@ -756,6 +756,22 @@ function groupLabel(catKey){
   return map[catKey] || catKey;
 }
 
+// Pemecahan hierarki klasifikasi buat tampilan Riwayat: level 1 ABI/ABO, level 2
+// BD/NBD (untuk ABI) atau Pra-Proyek/Rutin (untuk ABO). Dihitung langsung dari
+// catKey (A/B/C/D) tiap kali dipakai, BUKAN cuma dibaca dari field entry yang
+// tersimpan — supaya entry riwayat LAMA (yang disimpan sebelum field ini ada,
+// baik lokal maupun dari Google Sheet) tetap bisa ditampilkan benar tanpa perlu
+// migrasi data apa pun.
+function hierarchyBreakdown(catKey){
+  var map = {
+    A: { jenis:'ABI', sub:'BD' },
+    B: { jenis:'ABI', sub:'NBD' },
+    C: { jenis:'ABO', sub:'Pra-Proyek' },
+    D: { jenis:'ABO', sub:'Rutin' }
+  };
+  return map[catKey] || { jenis:'-', sub:'-' };
+}
+
 function findItem(code){
   for(var k in DATA){
     var res = null;
@@ -1020,12 +1036,16 @@ function stepNama(){
     ? '<div class="error-msg">Wajib diisi — jadi salah satu sumber utama deteksi otomatis.</div>'
     : '<div class="unit">Kaidah singkat: <b>Kondisi/Temuan &rarr; Dampak &rarr; Urgensi</b>. Contoh: "Hasil inspeksi rutin menemukan korosi pada pipa outlet separator, berisiko bocor dan berhenti produksi kalau tidak segera ditangani."</div>') +
   '</div>' +
-  '<div class="field"><label>Manfaat utama proyek</label>' +
+  '<div class="field'+(err.benefitProyek?' has-error':'')+'"><label>Manfaat Utama Proyek <span class="req">*</span></label>' +
   '<div class="chiprow">' +
     '<button class="chip'+(a.benefitProyek==='produksi'?' active':'')+'" data-action="benefit_produksi">Menambah produksi</button>' +
     '<button class="chip'+(a.benefitProyek==='mempertahankan'?' active':'')+'" data-action="benefit_mempertahankan">Mempertahankan produksi</button>' +
     '<button class="chip'+(a.benefitProyek==='lpo'?' active':'')+'" data-action="benefit_lpo">Menghindari LPO</button>' +
-  '</div></div>' +
+  '</div>' +
+  (err.benefitProyek
+    ? '<div class="error-msg">Wajib dipilih salah satu — jadi penentu utama ABI BD vs ABI NBD/ABO di mesin deteksi.</div>'
+    : '<div class="unit">Pilih yang paling menggambarkan tujuan kegiatan ini. "Menambah produksi" akan diarahkan ke ABI BD; pilihan lain diarahkan ke ABI NBD atau ABO.</div>') +
+  '</div>' +
   '<button class="btn primary full" data-action="mulai">Mulai Klasifikasi</button>';
 }
 
@@ -1191,21 +1211,19 @@ function expandWithSynonyms(tokens){
 // 2026 kenapa itu dibuang. Bobot ringan (bukan penentu tunggal), cuma nudge.
 var BD_KEYWORDS = ['development','pengembangan','pemboran','pengeboran','pembayaran'];
 var NBD_KEYWORDS = ['penggantian','upgrade','pengadaan','peralatan','fasilitas','pipa','peningkatan','substation'];
-// GATE konteks sumur buat kategori A. Kategori A ("Investasi BD Pengembangan")
-// per definisinya soal produksi/pengurasan/sumur — hampir semua itemnya (A1-A6)
-// menyebut sumur/workover/artificial lift/reservoir di deskripsinya. Tanpa gate
-// ini, kata umum yang KEBETULAN nempel di satu item A (mis. "refurbishment" di
-// A6 Field Reactivation) bisa menyeret proyek yang jelas-jelas TIDAK terkait
-// sumur sama sekali (contoh nyata: "Bridge Improvement" / perbaikan jembatan
-// akses, ini fasilitas permukaan biasa, bukan reaktivasi lapangan). Pola bug ini
-// sudah 3x kejadian dengan kata beda-beda (inspeksi->D4.a, equipment->B8,
-// refurbishment->A6) — gate ini benerin akar masalahnya buat kategori A secara
-// umum, bukan tambal kata per kata lagi. Diuji: tidak mengganggu kasus yang
-// memang benar konteks sumurnya (A2.c, A1 dengan kata "sumur"/"pemboran" dst).
-var WELL_CONTEXT_WORDS = ['sumur','workover','artificial','lift','reservoir','perforasi','pengurasan','recovery','eor','injeksi','well','pengeboran','pemboran'];
 
 var NAMA_WEIGHT = 2;
 var LATAR_WEIGHT = 1;
+// ATURAN KERAS (23 Juli 2026, permintaan Arief): "Manfaat Utama Proyek" sekarang
+// WAJIB diisi (lihat Constraint §7 di CLAUDE.md dan validasi di handler 'mulai'),
+// dan jadi GATE MUTLAK buat kategori A — bukan cuma nudge skor lagi:
+//   - benefitProyek === 'produksi'  -> HANYA kategori A yang dipertimbangkan.
+//   - benefitProyek lainnya (mempertahankan/lpo) -> kategori A DIKECUALIKAN
+//     TOTAL dari kandidat saran, walau teksnya menyebut kata-kata sumur.
+// Ini MENGGANTIKAN gate WELL_CONTEXT_WORDS berbasis kata kunci yang lama (yang
+// cuma heuristik teks, 3x kebobolan oleh kata yang kebetulan nempel di satu item
+// — lihat Riwayat Perubahan 22 Juli 2026 lanjutan 9) dengan sinyal eksplisit dari
+// user, yang jauh lebih tegas dan tidak bisa disalahtebak oleh kata kebetulan.
 function suggestClassification(nama, deskripsi, benefitProyek){
   var namaTokens = expandWithSynonyms(tokenize(nama));
   var deskTokens = expandWithSynonyms(tokenize(deskripsi));
@@ -1215,15 +1233,14 @@ function suggestClassification(nama, deskripsi, benefitProyek){
   deskTokens.forEach(function(t){ qSet[t]=(qSet[t]||0)+LATAR_WEIGHT; });
   var idx = buildKeywordIndex();
   var qAllTokens = namaTokens.concat(deskTokens);
-  var hasWellContext = qAllTokens.some(function(t){ return WELL_CONTEXT_WORDS.indexOf(t) > -1; });
-  var wellGateOk = hasWellContext || benefitProyek==='produksi';
   var best = null;
   idx.records.forEach(function(rec){
+    var isA = rec.catKey==='A';
+    if(isA && benefitProyek!=='produksi') return; // gate keras: bukan "menambah produksi" -> A dikecualikan total
+    if(!isA && benefitProyek==='produksi') return; // gate keras: "menambah produksi" -> HANYA A yang dipertimbangkan
     var score = 0;
     Object.keys(qSet).forEach(function(t){ if(rec.tokens[t]) score += (idx.idf[t]||1)*qSet[t]; });
     score += staticRotatingPenalty(qAllTokens, rec);
-    if(rec.catKey==='A' && !wellGateOk) score -= 8;
-    if(benefitProyek==='produksi' && rec.catKey==='A') score += 3;
     if(benefitProyek==='mempertahankan' && rec.catKey==='B') score += 3;
     if(benefitProyek==='lpo' && rec.catKey==='B') score += 3;
     // Nudge ringan dari kata kunci historis, cuma buat A/B (BD/NBD), tidak menyentuh C/D.
@@ -1519,9 +1536,12 @@ function renderHistory(){
   var html = syncHint;
   sorted.forEach(function(h){
     var cat = DATA[h.catKey];
+    var hier = hierarchyBreakdown(h.catKey);
     html += '<div class="histcard">' +
       '<span class="codechip" style="background:'+cat.color+'22;color:'+cat.color+'">'+h.itemCode+'</span>' +
-      '<div class="info"><b>'+(h.nama||h.itemName)+'</b><span>'+h.itemName+' · '+cat.short+'</span><span class="date">'+fmtDate(h.savedAt)+'</span></div>' +
+      '<div class="info"><b>'+(h.nama||h.itemName)+'</b>' +
+      '<span>'+hier.jenis+' › '+hier.sub+' · '+h.itemCode+' — '+h.itemName+'</span>' +
+      '<span class="date">'+fmtDate(h.savedAt)+'</span></div>' +
       '<button class="del" data-action="hapus" data-id="'+h.id+'">&times;</button>' +
       '</div>';
   });
@@ -1612,19 +1632,24 @@ document.getElementById('app').addEventListener('click', function(e){
     var errs = {};
     if(!state.answers.nama || !state.answers.nama.trim()) errs.nama = true;
     if(!state.answers.deskripsi || !state.answers.deskripsi.trim()) errs.deskripsi = true;
+    if(!state.answers.benefitProyek) errs.benefitProyek = true;
     if(Object.keys(errs).length){ state.formError = errs; render(); }
     else { state.formError = null; goTo('deteksi'); }
   } else if(action==='back'){
     goBack();
   } else if(action==='benefit_produksi'){
+    // Sejak jadi field wajib (23 Juli 2026), ini pilihan tunggal ala radio button,
+    // bukan toggle lagi — klik salah satu SELALU menetapkan nilainya, tidak bisa
+    // balik kosong lewat klik ulang. Field wajib tidak boleh punya jalan balik ke
+    // "belum diisi" selain lewat validasi form biasa.
     syncCurrentStepInputs();
-    state.answers.benefitProyek = (state.answers.benefitProyek==='produksi') ? undefined : 'produksi'; render();
+    state.answers.benefitProyek = 'produksi'; render();
   } else if(action==='benefit_mempertahankan'){
     syncCurrentStepInputs();
-    state.answers.benefitProyek = (state.answers.benefitProyek==='mempertahankan') ? undefined : 'mempertahankan'; render();
+    state.answers.benefitProyek = 'mempertahankan'; render();
   } else if(action==='benefit_lpo'){
     syncCurrentStepInputs();
-    state.answers.benefitProyek = (state.answers.benefitProyek==='lpo') ? undefined : 'lpo'; render();
+    state.answers.benefitProyek = 'lpo'; render();
   } else if(action==='terima_saran'){
     var scode = el.getAttribute('data-code');
     var sfound = findItem(scode);
@@ -1666,12 +1691,15 @@ document.getElementById('app').addEventListener('click', function(e){
     goTo('hasil');
   } else if(action==='simpan'){
     var found2 = findItem(state.answers.itemCode);
+    var hier2 = hierarchyBreakdown(found2.catKey);
     var entry = {
       id: uid(),
       nama: state.answers.nama || '',
       itemCode: state.answers.itemCode,
       itemName: found2.item.name,
       catKey: found2.catKey,
+      jenis: hier2.jenis,
+      sub: hier2.sub,
       flags: state.answers.category!=='D' ? computeFlags() : null,
       savedAt: new Date().toISOString()
     };
