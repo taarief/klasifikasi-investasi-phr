@@ -1097,7 +1097,29 @@ var STOPWORDS = {
   // power plant, backup power, dst) yang kebanyakan TIDAK ada hubungannya sama
   // HSSE. Lihat bug 22 Juli 2026 (lanjutan 10): "Upgrade Peralatan Obsolete SCADA
   // Power System" salah kedeteksi jadi HSSE gara-gara kata ini.
-  'power':1
+  'power':1,
+  // 'baru' (23 Juli 2026): kata generik "new" yang bisa nempel ke apa saja
+  // (sumur baru, fasilitas baru, sistem baru, dll), tapi kebetulan cuma muncul
+  // literal di A2.a/A2.b (dari frasa "lapisan baru"). IDF-nya jadi ~3.0
+  // (tertinggi dari semua token yang biasa cocok), gampang menyeret proyek yang
+  // sama sekali bukan soal pendalaman sumur. Bug nyata: "Bekasap GS Upgrade" +
+  // latar "...pengembangan sumur baru" salah kedeteksi A2.b (Pendalaman Sumur)
+  // padahal jelas soal PEMBANGUNAN FASILITAS (harusnya A1 Pengembangan
+  // Lapangan) — kata "baru" sendiri yang menang gara-gara IDF timpang, bukan
+  // "sumur"/"pengembangan" yang overlap ke A1 maupun A2.b secara setara. Pola
+  // bug yang sama persis dengan equipment/power di atas.
+  'baru':1,
+  // 'sudah'/'telah' (23 Juli 2026, ditemukan pas diagnosa bug 'baru' di atas):
+  // kata bantu waktu yang SANGAT umum ("already/has") di tulisan natural
+  // (mis. "kapasitas SUDAH tidak mencukupi"), tapi kebetulan rara di teks
+  // formal 49 item (cuma A6: "cadangannya SUDAH downgrade..."), jadi IDF-nya
+  // ikut timpang (2.41) dan menyeret query yang cuma kebetulan pakai kata ini
+  // ke A6 Field Reactivation padahal tidak ada hubungannya sama reaktivasi
+  // lapangan. Ini murni celah daftar stopword umum (bukan ambiguitas domain
+  // spesifik kayak pompa/substation) — kata bantu waktu generik seharusnya
+  // dari awal masuk stopword, kelewat pas daftar awal dibikin.
+  'sudah':1,
+  'telah':1
 };
 function tokenize(text){
   return (text||'').toLowerCase()
