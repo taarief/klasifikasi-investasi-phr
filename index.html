@@ -334,19 +334,24 @@
   }
   .chiprow{
     display:flex;
-    flex-wrap:wrap;
-    gap:8px;
+    flex-wrap:nowrap;
+    gap:6px;
     margin-bottom:16px;
   }
   .chip{
-    padding:8px 13px;
-    border-radius:99px;
+    flex:1;
+    min-width:0;
+    padding:8px 6px;
+    border-radius:var(--radius-sm);
     border:1px solid transparent;
     background:var(--panel-2);
     color:var(--text-muted);
     font-size:var(--fs-2);
+    line-height:1.3;
     font-weight:600;
     cursor:pointer;
+    text-align:center;
+    white-space:normal;
   }
   .chip.active{
     border-color:var(--accent-b);
@@ -614,7 +619,7 @@
       <div class="brandmark">KI</div>
       <h1>Klasifikasi Investasi</h1>
     </div>
-    <p class="ref">Fax No.133/PHE20000/2022-S0 · Pedoman A6-001/PHE11000/2023-S9 Rev.2 · IP: TA Arief Widiyatmoko</p>
+    <p class="ref">Fax No.133/PHE20000/2022-S0 · Pedoman A6-001/PHE11000/2023-S9 Rev.2 · IP: APR - TAA</p>
   </header>
   <main id="view"></main>
   <nav class="bottomnav">
@@ -1287,7 +1292,40 @@ var SYNONYMS = {
   'abandonment':['penutupan'],
   'dismantle':['decommissioning'],
   'reklamasi':['pemulihan','lingkungan'],
-  'remediasi':['pemulihan','lingkungan']
+  'remediasi':['pemulihan','lingkungan'],
+
+  // -- Ditambah 23 Juli 2026 dari analisis kata/frasa BD-vs-NBD tambahan yang
+  // dikasih Arief (dari pola judul historis, bukan dari Fax 133/Pedoman —
+  // sama filosofinya dengan BD_KEYWORDS/NBD_KEYWORDS di bawah). SENGAJA TIDAK
+  // semua item di daftar itu dimasukkan — lihat Riwayat Perubahan 23 Juli 2026
+  // buat daftar lengkap yang DILEWATI dan alasannya (nama lokasi field seperti
+  // Bangko/Minas/dst tidak prediktif BD/NBD sama sekali; "Small Field" sudah
+  // ditolak eksplisit di lanjutan 8 22 Juli karena semantiknya rapuh; kata
+  // generik berisiko tinggi macam "Motor"/"Phase"/"Header"/"Improvement"/"Gas"
+  // standalone dilewati karena pola bug equipment/power sebelumnya — kata
+  // umum yang kebetulan "khas" gampang menyeret konteks salah).
+  'polymer':['chemical'],
+  'steamflood':['termal'],
+  'waterflood':['water','flood'],
+  'infill':['pengembangan'],
+  'earthwork':['lahan'],
+  'retrofit':['obsolete'],
+  'availability':['kehandalan'],
+  'firewater':['fire'],
+  'firepump':['fire'],
+  'lightning':['hsse'],
+  'proteksi':['hsse'],
+  // BRV/PSV/ERV (blowdown/pressure safety/emergency relief valve) SENGAJA
+  // dibridge ke 'shutdown' (bukan cuma 'hsse') — ditemukan lewat tes: 'hsse'
+  // SENDIRIAN ambigu karena B2 (Kerja Ulang NBD) JUGA menyebut "HSSE" secara
+  // literal di desc resminya sebagai salah satu alasan workover NBD, jadi
+  // query yang cuma bawa token 'hsse' bisa kesasar ke B2 padahal yang
+  // dimaksud jelas soal PERALATAN safety valve (B3), bukan aktivitas workover.
+  // 'shutdown' ("safety shutdown system") cuma ada di desc B3, tidak di B2,
+  // jadi lebih tajam membedakan dua item yang sama-sama menyebut HSSE ini.
+  'brv':['hsse','shutdown'],
+  'psv':['hsse','shutdown'],
+  'erv':['hsse','shutdown']
 };
 // Penalti eksplisit static vs rotating — dua kelas equipment yang berlawanan
 // secara teknik, tidak bisa dijembatani lewat overlap kata biasa.
@@ -1358,8 +1396,30 @@ function expandWithSynonyms(tokens, contextTokens){
 // n>=8). SENGAJA tidak masukkan kata yang polanya kebetulan/tidak general secara
 // semantik (mis. "small", "produksi" sendirian) — lihat riwayat percakapan 22 Juli
 // 2026 kenapa itu dibuang. Bobot ringan (bukan penentu tunggal), cuma nudge.
-var BD_KEYWORDS = ['development','pengembangan','pemboran','pengeboran','pembayaran'];
-var NBD_KEYWORDS = ['penggantian','upgrade','pengadaan','peralatan','fasilitas','pipa','peningkatan','substation'];
+// Diperluas 23 Juli 2026: 'eksplorasi'/'explorasi'/'flowline' ditambah dari
+// analisis pola judul historis tambahan (Fungsi/DX SSDP/CEOR/Eksplorasi
+// korelasi kuat ke BD, lihat lanjutan 8 22 Juli). Ini kata-kata umum lapangan
+// yang TIDAK ada di Fax 133/Pedoman secara literal, sama filosofinya dengan
+// entri BD_KEYWORDS lain — nudge dari pola historis, bukan dari dokumen resmi.
+var BD_KEYWORDS = ['development','pengembangan','pemboran','pengeboran','pembayaran','eksplorasi','explorasi','flowline'];
+// Diperluas 23 Juli 2026 dari data historis tambahan yang dikasih Arief:
+// kehandalan, perbaikan/repair, optimasi, peremajaan, obsolete semuanya
+// condong NBD di data historis. 'perbaikan'/'repair' SENGAJA tetap dimasukkan
+// walau kata itu juga sering muncul literal di banyak nama item kategori D
+// (mis. D2.a "Perbaikan Artificial Lift") — nudge ini cuma +1 flat ke SEMUA
+// item B, jauh lebih kecil dari match token literal langsung yang dipakai D,
+// jadi tidak akan membajak kasus D yang memang jelas. Kalau nanti ternyata
+// kebalik (kasus D yang jelas malah kesalip B gara-gara nudge ini), cek dulu
+// skor sebelum tambal — lihat pola diagnosis di Riwayat Perubahan.
+// Diperluas lagi 23 Juli 2026: keluarga istilah instrumentasi/elektrikal
+// fasilitas eksisting (SCADA/DCS/MCC/dst) dan peralatan utility umum
+// (vessel/exchanger/stack/utility) dari analisis pola judul historis
+// tambahan Arief. SENGAJA TIDAK dimasukkan dari daftar itu: nama lokasi
+// field, "Small Field" (sudah ditolak eksplisit lanjutan 8), dan kata
+// generik berisiko tinggi (Motor/Gas/Phase/Header/Improvement standalone —
+// pola bug equipment/power yang sama, kata umum "kebetulan khas" gampang
+// menyeret konteks salah, lihat Riwayat Perubahan 23 Juli 2026).
+var NBD_KEYWORDS = ['penggantian','upgrade','pengadaan','peralatan','fasilitas','pipa','peningkatan','substation','kehandalan','perbaikan','repair','optimasi','peremajaan','obsolete','scada','dcs','mcc','relay','switchgear','transformer','ups','gcb','recloser','metering','detection','vessel','exchanger','stack','utility'];
 
 var NAMA_WEIGHT = 2;
 var LATAR_WEIGHT = 1;
@@ -1385,6 +1445,21 @@ function suggestClassification(nama, deskripsi, benefitProyek){
   deskTokens.forEach(function(t){ qSet[t]=(qSet[t]||0)+LATAR_WEIGHT; });
   var idx = buildKeywordIndex();
   var qAllTokens = namaTokens.concat(deskTokens);
+  // Data historis tambahan dari Arief (23 Juli 2026): kombinasi "pemboran"/
+  // "pengeboran" DAN "upgrade"/"peningkatan" secara bersamaan condong ABI BD.
+  // CATATAN JUJUR soal efeknya di arsitektur SEKARANG: sejak gate keras chip
+  // "Menambah Produksi" (lihat di atas), kategori A HANYA muncul kalau chip itu
+  // dipilih — begitu chip dipilih, C/D/B otomatis di-skip semua di atas, jadi
+  // boost +4 yang dihitung SAMA RATA ke SEMUA item A tidak mengubah item A MANA
+  // yang menang (semua naik sama besar, urutan relatifnya tetap). Manfaat
+  // nyatanya cuma SATU: menaikkan skor total supaya tidak jatuh ke ambang
+  // "belum cukup kata kunci" (`best.score<=0`) kalau overlap kata literal ke
+  // desc resmi kebetulan lemah — bukan penentu ITEM spesifik yang menang.
+  // Kalau ke depan butuh sinyal ini benar-benar menentukan item A spesifik,
+  // itu perlu redesign (boost per-item, bukan per-kategori) — diskusikan dulu
+  // sebelum diubah, jangan diam-diam bikin flat lagi.
+  var hasBdCombo = (qAllTokens.indexOf('pemboran')>-1 || qAllTokens.indexOf('pengeboran')>-1) &&
+                    (qAllTokens.indexOf('upgrade')>-1 || qAllTokens.indexOf('peningkatan')>-1);
   var best = null;
   idx.records.forEach(function(rec){
     var isA = rec.catKey==='A';
@@ -1393,6 +1468,7 @@ function suggestClassification(nama, deskripsi, benefitProyek){
     var score = 0;
     Object.keys(qSet).forEach(function(t){ if(rec.tokens[t]) score += (idx.idf[t]||1)*qSet[t]; });
     score += staticRotatingPenalty(qAllTokens, rec);
+    if(hasBdCombo && isA) score += 4;
     if(benefitProyek==='mempertahankan' && rec.catKey==='B') score += 3;
     if(benefitProyek==='lpo' && rec.catKey==='B') score += 3;
     // Nudge ringan dari kata kunci historis, cuma buat A/B (BD/NBD), tidak menyentuh C/D.
