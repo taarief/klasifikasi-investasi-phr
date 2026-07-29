@@ -1349,8 +1349,16 @@ var SYNONYMS = {
   'availability':['kehandalan'],
   'firewater':['fire'],
   'firepump':['fire'],
-  'lightning':['hsse'],
-  'proteksi':['hsse'],
+  // 'lightning'/'proteksi' juga dibridge ke 'shutdown' (bukan cuma 'hsse'),
+  // alasan SAMA PERSIS dengan BRV/PSV/ERV di bawah: kata "hsse" sendirian
+  // ambigu karena B2 JUGA menyebut "HSSE"/"well integrity" literal di desc
+  // resminya. Bug nyata 23 Juli 2026: "Pemasangan Lightning Protection System
+  // (LPS) Proteksi Tangki Timbun" kena TEPAT SERI 17.97 vs 17.97 antara B2 dan
+  // B3 (menang B2 cuma karena urutan array, bukan karena benar) — B2 menang
+  // sebagian dari kata "integrity" (via sinonim 'tangki'), yang KEBETULAN juga
+  // match "well integrity" di desc B2. 'shutdown' motong seri ini ke arah B3.
+  'lightning':['hsse','shutdown'],
+  'proteksi':['hsse','shutdown'],
   // BRV/PSV/ERV (blowdown/pressure safety/emergency relief valve) SENGAJA
   // dibridge ke 'shutdown' (bukan cuma 'hsse') — ditemukan lewat tes: 'hsse'
   // SENDIRIAN ambigu karena B2 (Kerja Ulang NBD) JUGA menyebut "HSSE" secara
