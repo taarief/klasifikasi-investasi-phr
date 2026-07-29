@@ -1369,7 +1369,26 @@ var SYNONYMS = {
   // jadi lebih tajam membedakan dua item yang sama-sama menyebut HSSE ini.
   'brv':['hsse','shutdown'],
   'psv':['hsse','shutdown'],
-  'erv':['hsse','shutdown']
+  'erv':['hsse','shutdown'],
+
+  // -- Fasilitas non-produksi / Operation Support (kategori B5), ditambah
+  // 23 Juli 2026. Bug nyata Arief: "Pembangunan Gedung Penyimpanan Data
+  // Subsurface... untuk Pemenuhan RDMS" (gedung arsip dokumen, JELAS bukan
+  // fasilitas produksi) kedeteksi D2.h/D3.a (soal AKUISISI DATA sumur/survey)
+  // gara-gara kata "data"/"reservoir" kebetulan match token itu — padahal B5
+  // (Operation Support, definisinya PERSIS "instalasi fasilitas...TIDAK
+  // berhubungan langsung dengan operasi produksi, seperti kantor, warehouse,
+  // workshop") sama sekali TIDAK PUNYA bridge buat kata "gedung"/"bangunan"/
+  // "penyimpanan" — skornya nol total, jadi tidak pernah bisa menang walau
+  // jelas-jelas paling relevan. Beda akar dari bug-bug sebelumnya (bukan kata
+  // yang overweighted, tapi kata yang SAMA SEKALI TIDAK PUNYA jembatan).
+  'gedung':['fasilitas'],
+  'bangunan':['fasilitas'],
+  // 'penyimpanan' (storage/warehousing) dibridge KHUSUS ke 'warehouse' (istilah
+  // Inggris literal di desc resmi B5) — jembatan paling tajam buat kasus ini,
+  // bukan cuma 'fasilitas' yang generik.
+  'penyimpanan':['warehouse'],
+  'dokumen':['kantor']
 };
 // Penalti eksplisit static vs rotating — dua kelas equipment yang berlawanan
 // secara teknik, tidak bisa dijembatani lewat overlap kata biasa.
