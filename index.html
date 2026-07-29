@@ -639,17 +639,17 @@ var DATA = {
     subtitle:'Investasi dalam rangka meningkatkan profit perusahaan yang dapat dijustifikasi keekonomiannya.',
     color:'var(--accent-a)', dim:'var(--accent-a-dim)',
     items:[
-      {code:'A1', name:'Pengembangan Lapangan', desc:'Pengembangan lapangan inisial dan lanjutan: pemboran sumur pengembangan, penyambungan sumur, pembangunan fasilitas permukaan, untuk memproduksikan dan mengkomersialisasikan cadangan migas.'},
-      {code:'A2', name:'Kerja Ulang (Workover) BD', desc:'Aktivitas remedial/pemulihan sumur untuk meningkatkan atau mengaktifkan kembali produksi, tidak termasuk perawatan sumur (well service).', children:[
+      {code:'A1', name:'Pengembangan Lapangan', desc:'Kegiatan pengembangan lapangan inisial dan pengembangan lanjutan dengan lingkup tipikal berupa pemboran sumur pengembangan, penyambungan sumur, serta pembangunan fasilitas permukaan, untuk memproduksikan dan mengkomersialisasikan cadangan migas.'},
+      {code:'A2', name:'Kerja Ulang (Workover) BD', desc:'Aktivitas remedial/pemulihan pada sumur migas untuk meningkatkan atau mengaktifkan kembali produksinya, tidak dapat dikelompokkan ke dalam pekerjaan perawatan sumur (well service), dengan tujuan peningkatan produksi dan pengurasan (recovery).', children:[
         {code:'A2.a', name:'Perforasi Pindah Lapisan', desc:'Perforasi pada lapisan baru yang menghasilkan peningkatan produksi dan pengurasan (recovery).'},
-        {code:'A2.b', name:'Pendalaman Sumur', desc:'Pendalaman sumur (deepening) pengembangan — bukan interval eksplorasi — untuk mengakses lapisan baru.'},
-        {code:'A2.c', name:'Perubahan Lifting Method', desc:'Perubahan mekanisme produksi dari sembur alam (natural flow) ke artificial lift (gas lift, SRP, ESP, PCP, dll).'},
-        {code:'A2.d', name:'Perubahan Fungsi Sumur (Injeksi ↔ Produksi)', desc:'Perubahan fungsi sumur dari injeksi ke produksi atau sebaliknya, untuk peningkatan produksi dan pengurasan.'}
+        {code:'A2.b', name:'Pendalaman Sumur', desc:'Pendalaman sumur (deepening) pengembangan (bukan interval eksplorasi) untuk mengakses lapisan baru yang menghasilkan peningkatan produksi dan pengurasan (recovery).'},
+        {code:'A2.c', name:'Perubahan Lifting Method', desc:'Perubahan mekanisme produksi sumur dari semula sembur alam (natural flow) menjadi menggunakan Artificial Lift seperti gas lift atau pompa (SRP, ESP, PCP, dll) dengan tujuan memperbaiki performa lifting dan memberikan peningkatan produksi dan pengurasan (recovery).'},
+        {code:'A2.d', name:'Perubahan Fungsi Sumur (Injeksi ↔ Produksi)', desc:'Perubahan fungsi sumur dari sumur injeksi menjadi sumur produksi (atau sebaliknya) dengan tujuan menghasilkan peningkatan produksi dan pengurasan (recovery).'}
       ]},
-      {code:'A3', name:'Lowering Pressure', desc:'Instalasi fasilitas permukaan (unit kompresi, pompa, dll) untuk menurunkan wellhead flowing pressure (WHFP).'},
-      {code:'A4', name:'Secondary Recovery', desc:'Instalasi fasilitas permukaan beserta pemboran/workover sumur injeksi (air/gas) untuk skema water flood atau pressure maintenance.'},
-      {code:'A5', name:'Enhanced Oil Recovery (EOR) Full Scale', desc:'Implementasi full scale proyek EOR skala lapangan: chemical (CEOR), gas (miscible, CO2, N2), termal, atau teknologi lain.'},
-      {code:'A6', name:'Field Reactivation', desc:'Reaktivasi lapangan idle (cadangan sudah downgrade ke contingent resources) melalui workover, artificial lift, dan/atau refurbishment fasilitas.'}
+      {code:'A3', name:'Lowering Pressure', desc:'Instalasi sistem fasilitas permukaan (unit kompresi, pompa, dan peralatan lain) untuk menurunkan wellhead flowing pressure (WHFP) yang menghasilkan peningkatan produksi dan pengurasan (recovery).'},
+      {code:'A4', name:'Secondary Recovery', desc:'Instalasi sistem fasilitas permukaan beserta pemboran atau workover sumur injeksi (air, gas) dan produksi untuk mengimplementasikan skema secondary recovery dalam bentuk water flood maupun pressure maintenance, dengan tujuan menghasilkan peningkatan produksi dan pengurasan (recovery).'},
+      {code:'A5', name:'Enhanced Oil Recovery (EOR) Full Scale', desc:'Implementasi full scale proyek EOR pada skala lapangan, dengan skema injeksi seperti chemical (CEOR), gas (miscible, CO2, N2, dan lain-lain), termal, serta teknologi lain.'},
+      {code:'A6', name:'Field Reactivation', desc:'Reaktivasi lapangan yang sebelumnya dalam kondisi idle (status pencatatan cadangannya sudah downgrade ke contingent resources) melalui pengaktifan sumur dengan berbagai metode seperti workover dan artificial lift; maupun pengaktifan kembali fasilitas permukaan melalui refurbishment.'}
     ]
   },
   B: {
@@ -659,31 +659,40 @@ var DATA = {
     subtitle:'Investasi dalam rangka mempertahankan value perusahaan dan/atau tujuan strategis.',
     color:'var(--accent-b)', dim:'var(--accent-b-dim)',
     items:[
-      {code:'B1', name:'Baseline Recovery', desc:'Pemulihan akses ke reservoir akibat kendala sumuran (unforeseen), dikerjakan sebelum cadangan downgrade ke contingent resources.'},
-      {code:'B2', name:'Kerja Ulang (Workover) NBD', desc:'Bagian dari aktivitas workover dengan tujuan selain penambahan produksi/pengurasan — misalnya HSSE dan well integrity.'},
-      {code:'B3', name:'HSSE dan ESG', desc:'Peningkatan kinerja/kepatuhan HSSE & ESG: fire & gas system, safety shutdown system, produced water reinjection, CCUS, flare/vent gas recovery, low carbon power/heat, dll.'},
-      {code:'B4', name:'Kehandalan Operasi (Operational Excellence)', desc:'Upgrading fasilitas existing untuk mengurangi disrupsi operasi, Lost Production Opportunity (LPO), dan kegagalan peralatan/downtime.'},
-      {code:'B5', name:'Operation Support', desc:'Instalasi fasilitas dan pengadaan peralatan yang tidak berhubungan langsung dengan operasi produksi: kantor, warehouse, workshop, dll.'},
-      {code:'B6', name:'Integrity dan Obsolescence', desc:'Kegiatan non-rutin mempertahankan/meningkatkan integritas fasilitas, dan penggantian peralatan/sistem yang obsolete atau terdegradasi.'},
-      {code:'B7', name:'Asset Restoration', desc:'Penggantian fasilitas produksi karena degradasi atau kerusakan akibat insiden.'},
-      {code:'B8', name:'Rotating Equipment Change Out', desc:'Penggantian rotating equipment termasuk ESP. Equipment berupa paket peralatan, bukan spare part.'},
-      {code:'B9', name:'Pilot Project', desc:'Implementasi proyek skala kecil untuk menilai kelayakan proyek full scale.'},
-      {code:'B10', name:'Pilot EOR', desc:'Penerapan EOR skala kecil untuk mengetahui nilai komersial metode EOR sebagai referensi pengembangan skala lapangan.'},
-      {code:'B11', name:'Field Trial EOR', desc:'Tahapan uji coba lapangan sebagai bagian dari Pilot EOR untuk mengurangi risiko teknis. Tidak berdiri sendiri.'}
+      {code:'B1', name:'Baseline Recovery', desc:'Pemulihan akses ke reservoir akibat sumur yang mengalami kendala sumuran (unforeseen), yang dikerjakan sebelum status pencatatan cadangan downgrade ke contingent resources.'},
+      {code:'B2', name:'Kerja Ulang (Workover) NBD', desc:'Bagian dari aktifitas Workover yang dilakukan dengan tujuan selain penambahan produksi dan pengurasan (recovery), diantaranya HSSE, well integrity, dan yang sejenisnya.'},
+      {code:'B3', name:'HSSE dan ESG', desc:'Peningkatan kinerja maupun kepatuhan pada aturan dan standar Health, Safety, Security and Environmental (HSSE) dan Environmental, Social and Governance (ESG), misalnya upgrading terhadap fire and gas (F&G) system, safety shutdown system, produced water reinjection dengan tujuan disposal, program dekarbonisasi seperti carbon capture utilization and storage (CCUS), energy demand and efficiency improvement, flare/vent gas recovery, low carbon power (NRE), low carbon heat, dan lain-lain.'},
+      {code:'B4', name:'Kehandalan Operasi (Operational Excellence)', desc:'Peningkatan kinerja (upgrading) fasilitas operasi yang sudah ada untuk mengurangi potensi disrupsi operasi, Lost Production Opportunity (LPO), dan kegagalan peralatan atau operation downtime.'},
+      {code:'B5', name:'Operation Support', desc:'Instalasi fasilitas dan pengadaan peralatan yang tidak berhubungan langsung dengan kegiatan operasi produksi, seperti kantor, warehouse, workshop, dan lain-lain.'},
+      {code:'B6', name:'Integrity dan Obsolescence', desc:'Kegiatan non rutin untuk mempertahankan atau meningkatkan integritas fasilitas operasi, dan penggantian peralatan atau sistem operasi yang sudah obsolete (suku cadang dan pemeliharaan sudah tidak didukung lagi oleh manufacturer) atau mengalami degradasi performance.'},
+      {code:'B7', name:'Asset Restoration', desc:'Penggantian fasilitas produksi karena degradasi atau kerusakan yang disebabkan oleh insiden.'},
+      {code:'B8', name:'Rotating Equipment Change Out', desc:'Penggantian rotating equipment, termasuk ESP. Equipment adalah paket peralatan, bukan spare part.'},
+      {code:'B9', name:'Pilot Project', desc:'Implementasi proyek berskala kecil untuk menilai kelayakan proyek full scale.'},
+      // Catatan dari dokumen sumber (SENGAJA tidak dimasukkan ke `desc` yang
+      // diindeks): Pilot EOR / Field Trial EOR baru masuk kategori ABI NBD kalau
+      // di dalamnya ada aktifitas pengeboran/workover yang sendirinya juga masuk
+      // kategori NBD (lihat B2). Kalau kata "pengeboran"/"workover" ikut dimasukkan
+      // ke desc di sini, dua item ini jadi ikut bersaing di query workover generik
+      // yang sama sekali bukan soal pilot/uji coba EOR — presisi turun tanpa
+      // manfaat, karena nuansa "kondisional" begini memang butuh judgement manusia,
+      // bukan sesuatu yang bisa ditangkap keyword index. Disclaimer app sudah
+      // menegaskan ini saran awal, bukan keputusan final.
+      {code:'B10', name:'Pilot EOR', desc:'Kegiatan penerapan EOR pada skala kecil untuk mengetahui nilai komersial metode EOR, digunakan sebagai referensi dalam pengembangan skala lapangan. Dapat melakukan field trial jika dibutuhkan.'},
+      {code:'B11', name:'Field Trial EOR', desc:'Kegiatan tahapan uji coba di lapangan, merupakan bagian dari Pilot EOR, untuk mengurangi risiko teknis terkait pelaksanaan pilot. Kegiatan Field Trial tidak berdiri sendiri.'}
     ]
   },
   C: {
     code:'C', key:'C',
     title:'Biaya Pra-Proyek',
     short:'Biaya Pra-Proyek',
-    subtitle:'Biaya penyiapan usulan Investasi di Tahap Kajian Lanjut sampai diperolehnya keputusan Investasi (FID/Pre-FID/Pre-ID). Perlu persetujuan tertulis Direktur Pengusul.',
+    subtitle:'Biaya untuk penyiapan usulan Investasi di Tahap Kajian Lanjut sampai dengan diperolehnya keputusan Investasi (FID/Pre-FID/Pre-ID) dan harus mendapatkan persetujuan tertulis dari Direktur Pengusul.',
     color:'var(--accent-c)', dim:'var(--accent-c-dim)',
     items:[
       {code:'C1', name:'Site Survey', desc:'Survei lapangan untuk mendukung kegiatan engineering dan konstruksi.'},
-      {code:'C2', name:'Pengadaan Lahan < 10 Ha', desc:'Pengadaan lahan untuk fasilitas produksi/pemboran sumur di lapangan onshore, maksimum 10 Ha.'},
-      {code:'C3', name:'Penyiapan Lahan (Site Preparation)', desc:'Penyiapan lahan untuk fasilitas produksi/pemboran sumur di lapangan onshore.'},
-      {code:'C4', name:'Front End Engineering Design (FEED)', desc:'Seluruh kegiatan engineering di Tahap Kajian Lanjut.'},
-      {code:'C5', name:'Perizinan dan Formalities', desc:'Seluruh kegiatan pengurusan dan persetujuan perizinan dan formalities.'},
+      {code:'C2', name:'Pengadaan Lahan < 10 Ha', desc:'Pengadaan lahan untuk pembangunan fasilitas produksi atau pemboran sumur di lapangan onshore dengan luas maksimum 10 Ha.'},
+      {code:'C3', name:'Penyiapan Lahan (Site Preparation)', desc:'Penyiapan lahan untuk pembangunan fasilitas produksi atau pemboran sumur di lapangan onshore.'},
+      {code:'C4', name:'Front End Engineering Design (FEED)', desc:'Semua kegiatan engineering di Tahap Kajian Lanjut.'},
+      {code:'C5', name:'Perizinan dan Formalities', desc:'Semua kegiatan untuk pengurusan dan persetujuan perizinan (perijinan) dan formalities.'},
       {code:'C6', name:'Pembangunan Akses Kegiatan Proyek', desc:'Pembangunan akses jalan untuk kegiatan proyek di lapangan onshore.'}
     ]
   },
@@ -694,38 +703,47 @@ var DATA = {
     subtitle:'Kegiatan yang berhubungan langsung dengan operasi produksi.',
     color:'var(--accent-d)', dim:'var(--accent-d-dim)',
     items:[
-      {code:'D1', name:'Kerja Ulang (Workover) ABO', desc:'Bagian dari aktivitas workover yang tidak dapat dikategorikan sebagai workover BD maupun NBD.', children:[
+      {code:'D1', name:'Kerja Ulang (Workover) ABO', desc:'Bagian dari aktifitas workover yang tidak bisa dikategorikan sebagai workover BD maupun workover NBD.', children:[
         {code:'D1.a', name:'Perekahan Formasi (Fracturing)', desc:'Pemompaan di atas tekanan rekah pada layer yang sudah diproduksikan (existing producing layer).'},
-        {code:'D1.b', name:'Perubahan Sistem Lifting — Sewa Artificial Lift', desc:'Implementasi metode produksi artificial lift dengan fasilitas sewa.'}
+        {code:'D1.b', name:'Perubahan Sistem Lifting — Sewa Artificial Lift', desc:'Implementasi metode produksi dengan artificial lift dengan fasilitas sewa (penyewaan peralatan artificial lift).'}
       ]},
-      {code:'D2', name:'Perawatan Sumur (Well Services)', desc:'Pekerjaan perawatan sumur untuk mempertahankan produksi dan menjaga sumur tetap berproduksi.', children:[
+      {code:'D2', name:'Perawatan Sumur (Well Services)', desc:'Pekerjaan yang merupakan perawatan sumur dalam upaya mempertahankan produksi dan perbaikan sumur untuk menjaga agar sumur tetap dapat berproduksi.', children:[
         {code:'D2.a', name:'Perbaikan Artificial Lift', desc:'Perbaikan alat artificial lift.'},
-        {code:'D2.b', name:'Perforasi Pada Lapisan Yang Sama', desc:'Additional perforation di lapisan yang sudah diproduksikan.'},
-        {code:'D2.c', name:'Perforasi Pada Interval Yang Sama (Reperforation)', desc:'Perforasi ulang pada interval yang sama.'},
+        {code:'D2.b', name:'Perforasi Pada Lapisan Yang Sama', desc:'Perforasi pada lapisan yang sama (additional perforation in the same layer).'},
+        {code:'D2.c', name:'Perforasi Pada Interval Yang Sama (Reperforation)', desc:'Perforasi pada interval yang sama.'},
         {code:'D2.d', name:'Chemical Pumping / Injection', desc:'Pemompaan di bawah tekanan rekah.'},
-        {code:'D2.e', name:'Perbaikan/Penggantian Peralatan Sumur', desc:'Perbaikan atau penggantian peralatan sumur, di permukaan maupun bawah permukaan.'},
-        {code:'D2.f', name:'Perawatan Permukaan (Surface Maintenance)', desc:'Perawatan peralatan sumur di permukaan: wellhead, X-mass tree, valves, dll.'},
-        {code:'D2.g', name:'Perawatan Bawah Permukaan (Downhole Maintenance)', desc:'Perawatan peralatan sumur di bawah permukaan: tubing, scale/sand/fishing, dll.'},
-        {code:'D2.h', name:'Pengambilan Data Sumur', desc:'Pengambilan data sumur — BHP, Sonolog, Dynagraph.'}
+        {code:'D2.e', name:'Perbaikan/Penggantian Peralatan Sumur', desc:'Perbaikan atau penggantian peralatan sumur baik yang ada di permukaan maupun di bawah permukaan.'},
+        {code:'D2.f', name:'Perawatan Permukaan (Surface Maintenance)', desc:'Perawatan peralatan sumur yang ada di permukaan seperti wellhead, X-mass Tree, Valves, dan lain-lain.'},
+        {code:'D2.g', name:'Perawatan Bawah Permukaan (Downhole Maintenance)', desc:'Perawatan peralatan sumur yang ada di bawah permukaan seperti tubing, akses (Scale, Sand, Fishing), dan lain-lain.'},
+        {code:'D2.h', name:'Pengambilan Data Sumur', desc:'Pengambilan data sumur, misalnya BHP, Sonolog, Dynagraph.'}
       ]},
-      {code:'D3', name:'Kegiatan Pra-Pengembangan', desc:'Kegiatan pra-proyek di tahap perencanaan, sebelum Tahap Kajian Lanjut. Masuk RKAP sebagai ABO; direview untuk finalisasi alokasi ABI/ABO jika mendapat Persetujuan Investasi sebelum tutup buku.', children:[
-        {code:'D3.a', name:'Survey GGRP', desc:'Survey akuisisi data geofisika (seismik/non-seismik), geologi lapangan, geokimia, dan sejenisnya.'},
-        {code:'D3.b', name:'Pengolahan Data Survey GGRP', desc:'Pengolahan data geofisika, geologi, geokimia, geomekanik, PVT, dan sejenisnya.'},
-        {code:'D3.c', name:'Studi GGRP', desc:'Studi Geology, Geophysics, Reservoir and Production untuk mendukung rencana pengembangan.'},
-        {code:'D3.d', name:'Survey Keteknikan', desc:'Survey geoteknikal/geofisikal untuk kondisi seabed dan daya dukung tanah.'},
-        {code:'D3.e', name:'EOR Study', desc:'Studi laboratorium, studi GGRP, tracer test, dll untuk mendukung usulan proyek EOR.'},
+      {code:'D3', name:'Kegiatan Pra-Pengembangan', desc:'Kegiatan pra-proyek yang dilakukan di tahapan perencanaan proyek, sebelum Tahap Kajian Lanjut. Masuk RKAP tahun berjalan dengan kategori ABO; direview untuk finalisasi alokasi biaya (ABI atau tetap ABO) kalau mendapat Persetujuan Investasi sebelum tutup buku periode laporan keuangan tahun berjalan.', children:[
+        {code:'D3.a', name:'Survey GGRP', desc:'Semua survey data akuisisi termasuk survey geofisika (seismik dan non seismik), geologi lapangan, geokimia dan sejenisnya yang diperlukan untuk mendukung rencana pengembangan.'},
+        {code:'D3.b', name:'Pengolahan Data Survey GGRP', desc:'Pengolahan data survey termasuk data geofisika (seismik dan non seismik), data geologi, geokimia, geomekanik, PVT, dan sejenisnya yang diperlukan untuk mendukung rencana pengembangan.'},
+        {code:'D3.c', name:'Studi GGRP', desc:'Semua studi Geology, Geophysics, Reservoir and Production yang diperlukan untuk mendukung rencana pengembangan.'},
+        // Klausa tujuan pemakaian dari dokumen sumber ("...dipakai untuk
+        // menentukan lokasi dan pemasangan anjungan lepas pantai, bangunan di
+        // onshore, dan lain-lain") SENGAJA tidak dimasukkan ke desc yang
+        // diindeks — kata "lokasi"/"bangunan"/"onshore" di situ kebetulan
+        // tumpang tindih kuat dengan C3 Penyiapan Lahan (Site Preparation) dan
+        // menyeret query soal persiapan lahan proyek biasa ke sini padahal
+        // yang dimaksud lebih ke survey teknis itu sendiri. Pola sama dengan
+        // catatan B10/B11 di atas: klausa "downstream purpose" begini lebih
+        // baik jadi komentar, bukan token yang diindeks.
+        {code:'D3.d', name:'Survey Keteknikan', desc:'Survey geoteknikal, geofisikal dan survey lainnya yang diperlukan untuk mengetahui kondisi seabed dan daya dukung tanah.'},
+        {code:'D3.e', name:'EOR Study', desc:'Studi-studi yang diperlukan untuk mendukung usulan proyek EOR, seperti studi laboratorium, studi GGRP, Tracer Test, dan lain-lain.'},
         {code:'D3.f', name:'Pre-FEED', desc:'Kegiatan engineering yang diperlukan pada Tahap Seleksi.'},
-        {code:'D3.g', name:'Studi Kelayakan dan Preliminary Engineering', desc:'Studi/analisa kelayakan teknologi atau peralatan; engineering pendahuluan untuk studi awal proyek.'}
+        {code:'D3.g', name:'Studi Kelayakan dan Preliminary Engineering', desc:'Kegiatan studi/analisa atau penelitian untuk mengevaluasi kelayakan suatu teknologi dari suatu peralatan atau equipment; kegiatan engineering pendahuluan yang diperlukan untuk mendukung studi awal proyek.'}
       ]},
       {code:'D4', name:'Kegiatan Rutin Operasi Produksi', desc:'Kegiatan rutin yang berhubungan langsung dengan operasi produksi.', children:[
-        {code:'D4.a', name:'Inspeksi Rutin Fasilitas dan/atau Peralatan', desc:'Inspeksi reguler sesuai aturan/standar: rekualifikasi anjungan, pengetesan safety shutdown system, pemutakhiran PLO, dll.'},
-        {code:'D4.b', name:'Perawatan Fasilitas', desc:'Perawatan rutin dan penggantian suku cadang/consumable secara berkala, termasuk replacement in kind.'}
+        {code:'D4.a', name:'Inspeksi Rutin Fasilitas dan/atau Peralatan', desc:'Inspeksi reguler fasilitas dan peralatan sesuai dengan aturan dan standar yang berlaku, misalnya inspeksi rekualifikasi anjungan, inspeksi dan pengetesan reguler safety shutdown system, pemutakhiran Persetujuan Layak Operasi (PLO), dan lain-lain.'},
+        {code:'D4.b', name:'Perawatan Fasilitas', desc:'Kegiatan perawatan rutin beserta penggantian suku cadang dan consumable materials yang dilakukan secara berkala untuk menjaga integritas dan kehandalan fasilitas produksi. Replacement in kind sebagai bagian dari perawatan fasilitas produksi.'}
       ]},
-      {code:'D5', name:'Kegiatan Paska Operasi (KPO)', desc:'Penutupan sumur permanen, penghentian pengoperasian, pembongkaran fasilitas, dan pemulihan lingkungan di WK.', children:[
-        {code:'D5.a', name:'Penyiapan dan Perencanaan Usulan KPO', desc:'Tahap Inisiasi KPO, Tahap Seleksi KPO, dan Tahap Kajian Lanjut KPO.'},
-        {code:'D5.b', name:'Penutupan Sumur (P&A)', desc:'Kegiatan penutupan sumur secara permanen.'},
-        {code:'D5.c', name:'Decommissioning', desc:'Pembongkaran dan pemindahan fasilitas produksi.'},
-        {code:'D5.d', name:'Pasca KPO', desc:'Disposal, pembersihan, pemulihan lingkungan, dan kegiatan lain pasca pelaksanaan KPO.'}
+      {code:'D5', name:'Kegiatan Paska Operasi (KPO)', desc:'Kegiatan yang berhubungan dengan penutupan sumur secara permanen, penghentian pengoperasian, dan menghilangkan kemampuan fasilitas produksi dan fasilitas penunjang untuk dapat dioperasikan kembali (termasuk pembongkarannya secara permanen), serta melakukan pemulihan lingkungan di WK pada Kegiatan Usaha Hulu Minyak dan Gas Bumi.', children:[
+        {code:'D5.a', name:'Penyiapan dan Perencanaan Usulan KPO', desc:'Kegiatan penyiapan dan perencanaan usulan KPO dari Tahap Inisiasi KPO, Tahap Seleksi KPO, dan Tahap Kajian Lanjut KPO.'},
+        {code:'D5.b', name:'Penutupan Sumur (P&A)', desc:'Kegiatan penutupan (P&A) sumur secara permanen.'},
+        {code:'D5.c', name:'Decommissioning', desc:'Kegiatan pembongkaran, pemindahan fasilitas produksi.'},
+        {code:'D5.d', name:'Pasca KPO', desc:'Kegiatan disposal, pembersihan, pemulihan lingkungan dan kegiatan lain yang diperlukan pasca pelaksanaan KPO.'}
       ]}
     ]
   }
@@ -1129,7 +1147,13 @@ function scoreItemForQuery(item, qRaw, qTokens){
 // dikurasi manual. Tambah entri baru di sini kalau ada kata lapangan yang sering
 // dipakai tapi hasil pencarian/deteksinya kurang pas.
 var SYNONYMS = {
-  'pompa':['artificial','lift','peralatan'],
+  // 'pompa' SENGAJA TIDAK ada di sini lagi (dulu ['artificial','lift','peralatan']
+  // tanpa syarat) — lihat WELL_EQUIPMENT_CONTEXT + expandWithSynonyms() di bawah
+  // buat kenapa dan gantinya. Ringkasnya: "pompa" itu ambigu, bisa berarti pompa
+  // artificial lift DI SUMUR atau pompa/peralatan biasa DI FASILITAS PERMUKAAN,
+  // dua domain berbeda (bug dilaporkan Arief 23 Juli 2026: "pompa fasilitas
+  // produksi" ditarik ke D1.b/artificial lift padahal bukan konteks sumur sama
+  // sekali). Sekarang ekspansinya kondisional, bukan tabel statis biasa.
   'rusak':['perbaikan','kerusakan'],
   'bocor':['perbaikan','penggantian'],
   'ganti':['penggantian','replacement'],
@@ -1145,7 +1169,10 @@ var SYNONYMS = {
   'renovasi':['perbaikan','perawatan'],
   'cek':['inspeksi'],
   'periksa':['inspeksi'],
-  'sewa':['sewa','artificial','lift'],
+  // 'sewa' juga TIDAK unconditional ke artificial/lift lagi, alasan sama persis
+  // dengan 'pompa' di atas — "sewa" bisa berarti sewa artificial lift (D1.b) TAPI
+  // bisa juga sewa alat/genset/fasilitas biasa yang tidak ada hubungannya sama
+  // sumur. Lihat expandWithSynonyms().
   'sumuran':['sumur'],
   'gudang':['fasilitas'],
   // istilah Inggris yang lazim dipakai campur di lapangan migas — dijembatani
@@ -1176,7 +1203,91 @@ var SYNONYMS = {
   // yang mengandung token 'rotating' kalau query menyebut 'static'. Jangan hapus
   // penalti ini, itu fix langsung buat bug fatal 22 Juli 2026 (tank/static equipment
   // salah kedeteksi jadi B8 Rotating Equipment Change Out).
-  'static':['integrity','fasilitas','peralatan']
+  'static':['integrity','fasilitas','peralatan'],
+
+  // ============================================================
+  // EKSPANSI 23 Juli 2026 — toleransi parafrase/bahasa lapangan.
+  // Arief kasih PDF asli Fax 133 (docs/sumber/), semua desc di DATA sudah
+  // dicocokkan verbatim ke lampirannya. Kamus di bawah ini menjembatani kata
+  // yang REALISTIS dipakai user di lapangan (bukan istilah baku dokumen) ke
+  // token yang benar-benar ada di desc/name resmi. Tiap target token SUDAH
+  // diverifikasi manual ada di corpus (lihat DATA) — bukan tebakan.
+  // Filosofi sama dengan kamus lama: additive, dikurasi manual per kata,
+  // BUKAN stemmer generik. Sengaja tidak bikin stemmer generik (potong
+  // imbuhan me-/pe-/-kan/-an otomatis) karena riwayat bug di file ini
+  // (equipment/power/static-rotating) menunjukkan aturan otomatis yang
+  // longgar gampang nyeret konteks yang salah — lebih aman nambah padanan
+  // spesifik satu-satu yang sudah diverifikasi tidak bentrok.
+  // ============================================================
+
+  // -- Reaktivasi lapangan & pengembangan (kategori A) --
+  'reaktivasi':['reactivation'],
+  'mengaktifkan':['reactivation'],
+  'pengaktifan':['reactivation'],
+  'nganggur':['idle'],
+  'menganggur':['idle'],
+  'komersialisasi':['mengkomersialisasikan'],
+  'komersialkan':['mengkomersialisasikan'],
+  'nambah':['penambahan','peningkatan'],
+  'menambah':['penambahan','peningkatan'],
+  'tingkatkan':['peningkatan'],
+  'meningkatkan':['peningkatan'],
+  'pulihkan':['pemulihan'],
+  'memulihkan':['pemulihan'],
+  'suntik':['injeksi'],
+  'penyuntikan':['injeksi'],
+  'steam':['termal'],
+  'uap':['termal'],
+
+  // -- Artificial lift / jenis pompa (dipakai lintas A2.c, D1.b, D2.a, B8) --
+  'submersible':['esp'],
+  'sucker':['srp'],
+
+  // -- HSSE, ESG, dekarbonisasi (kategori B3) --
+  'k3':['hsse'],
+  'keselamatan':['hsse'],
+  'kebakaran':['fire','hsse'],
+  'emisi':['dekarbonisasi'],
+  'karbon':['dekarbonisasi','ccus'],
+  'efisiensi':['efficiency'],
+  'energi':['energy'],
+  'suar':['flare'],
+
+  // -- Kehandalan operasi / disrupsi (kategori B4) --
+  'gangguan':['disrupsi'],
+  'terganggu':['disrupsi'],
+
+  // -- Integrity & obsolescence (kategori B6) --
+  'usang':['obsolete'],
+  'ketinggalan':['obsolete'],
+  'kuno':['obsolete'],
+  'discontinued':['obsolete'],
+  'performa':['performance'],
+
+  // -- Asset restoration (kategori B7) --
+  'kecelakaan':['insiden'],
+  'musibah':['insiden'],
+
+  // -- Suku cadang / perawatan rutin (D4.b, B6) --
+  'sparepart':['suku','cadang'],
+  'spare':['suku','cadang'],
+  'berkala':['rutin'],
+  'service':['perawatan'],
+  'upgrade':['upgrading'],
+
+  // -- Studi & pra-pengembangan (kategori C, D3) --
+  'kajian':['studi'],
+  'analisa':['studi'],
+  'riset':['studi'],
+  'tanah':['lahan'],
+
+  // -- Penutupan sumur & pasca operasi / KPO (kategori D5) --
+  'plug':['penutupan'],
+  'abandon':['penutupan'],
+  'abandonment':['penutupan'],
+  'dismantle':['decommissioning'],
+  'reklamasi':['pemulihan','lingkungan'],
+  'remediasi':['pemulihan','lingkungan']
 };
 // Penalti eksplisit static vs rotating — dua kelas equipment yang berlawanan
 // secara teknik, tidak bisa dijembatani lewat overlap kata biasa.
@@ -1187,9 +1298,47 @@ function staticRotatingPenalty(qTokensRaw, rec){
   if(hasRotating && !hasStatic && rec.tokens['static']) return -15;
   return 0;
 }
-function expandWithSynonyms(tokens){
+// Bukti positif konteks SUMUR/DOWNHOLE, dipakai HANYA buat disambiguasi kata
+// ambigu macam "pompa"/"sewa" (lihat expandWithSynonyms() di bawah) — BUKAN gate
+// kategori A lagi (itu sudah jadi tanggung jawab chip "Manfaat Utama Proyek",
+// lihat Constraint §9 di CLAUDE.md). Dua mekanisme ini tujuannya beda: yang satu
+// nentuin ABI BD vs bukan (chip, keras/mutlak), yang ini cuma bantu milih arah
+// ekspansi sinonim yang tepat buat 1-2 kata yang genuinely dua-makna.
+var WELL_EQUIPMENT_CONTEXT = ['sumur','well','downhole','workover','artificial','esp','srp','pcp','wellhead','tubing','sumuran','reservoir'];
+// Bug dilaporkan Arief 23 Juli 2026: kata "pompa" (dan "sewa") dulu SELALU
+// diekspansi ke ['artificial','lift'] apa pun konteksnya (lihat komentar di
+// SYNONYMS di atas), jadi "Perbaikan Pompa Fasilitas Produksi" — yang jelas-jelas
+// soal pompa DI FASILITAS PERMUKAAN, bukan pompa artificial lift DI SUMUR — malah
+// ditarik ke D1.b/D2.a/A2.c. Diverifikasi lewat simulasi sebelum fix: query
+// "Perbaikan Fasilitas Produksi" (tanpa kata "pompa") sudah BENAR ke B6, tapi
+// begitu kata "pompa" ditambahkan sendirian, hasilnya lompat ke D1.b — jadi kata
+// itu sendiri yang jadi biang keladi, bukan sinyal lain di kalimat.
+// Fix: "pompa"/"sewa" cuma diekspansi ke artificial/lift kalau ada BUKTI LAIN di
+// query yang menunjukkan ini soal sumur (lihat WELL_EQUIPMENT_CONTEXT). Kalau
+// tidak ada, cuma diekspansi ke 'peralatan' generik — biar item fasilitas
+// permukaan (B4/B6/B7/D4.b dst) bisa bersaing wajar lewat kata lain di kalimat
+// user (fasilitas, produksi, stasiun, transfer, booster, dst), bukan otomatis
+// ketarik ke artificial lift oleh satu kata ambigu.
+// `contextTokens` opsional: token yang dipakai buat cek WELL_EQUIPMENT_CONTEXT,
+// default ke `tokens` itu sendiri kalau tidak dikasih (cukup buat pemakaian di
+// scoreItemForQuery, satu query string, tidak ada isu lintas-field). Di
+// suggestClassification() ini WAJIB diisi dengan token gabungan Nama+Latar
+// Belakang — kalau tidak, kata "sumur" yang disebut di Latar Belakang tidak akan
+// "kelihatan" waktu ekspansi kata "pompa" yang disebut terpisah di Nama Kegiatan
+// (dua field itu di-tokenize dan di-expand TERPISAH karena bobotnya beda,
+// NAMA_WEIGHT vs LATAR_WEIGHT — lihat pemanggilannya).
+function expandWithSynonyms(tokens, contextTokens){
+  var ctx = contextTokens || tokens;
   var out = tokens.slice();
-  tokens.forEach(function(t){ if(SYNONYMS[t]) out = out.concat(SYNONYMS[t]); });
+  var hasWellContext = ctx.some(function(t){ return WELL_EQUIPMENT_CONTEXT.indexOf(t) > -1; });
+  tokens.forEach(function(t){
+    if(t==='pompa' || t==='sewa'){
+      out.push('peralatan');
+      if(hasWellContext){ out.push('artificial'); out.push('lift'); }
+      return;
+    }
+    if(SYNONYMS[t]) out = out.concat(SYNONYMS[t]);
+  });
   return out;
 }
 // Nama Kegiatan menjelaskan AKSI yang diusulkan (Bagaimana-Apa-Dimana).
@@ -1225,8 +1374,11 @@ var LATAR_WEIGHT = 1;
 // — lihat Riwayat Perubahan 22 Juli 2026 lanjutan 9) dengan sinyal eksplisit dari
 // user, yang jauh lebih tegas dan tidak bisa disalahtebak oleh kata kebetulan.
 function suggestClassification(nama, deskripsi, benefitProyek){
-  var namaTokens = expandWithSynonyms(tokenize(nama));
-  var deskTokens = expandWithSynonyms(tokenize(deskripsi));
+  var namaRaw = tokenize(nama);
+  var deskRaw = tokenize(deskripsi);
+  var combinedRaw = namaRaw.concat(deskRaw);
+  var namaTokens = expandWithSynonyms(namaRaw, combinedRaw);
+  var deskTokens = expandWithSynonyms(deskRaw, combinedRaw);
   if(namaTokens.length===0 && deskTokens.length===0 && !benefitProyek) return null;
   var qSet = {};
   namaTokens.forEach(function(t){ qSet[t]=(qSet[t]||0)+NAMA_WEIGHT; });
