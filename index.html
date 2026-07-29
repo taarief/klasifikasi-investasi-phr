@@ -1133,7 +1133,37 @@ var STOPWORDS = {
   // dari kasus ini. 'pengadaan' juga DICABUT dari NBD_KEYWORDS di bawah karena
   // begitu di-stopword, kata itu tidak akan pernah lolos tokenize() lagi jadi
   // entri di NBD_KEYWORDS untuk kata ini otomatis jadi dead code.
-  'pengadaan':1
+  'pengadaan':1,
+  // 23 Juli 2026 (dataset 167-baris sub-klasifikasi NBD): daftar stopword di
+  // atas cuma nutup kata fungsi Bahasa Indonesia, tapi banyak judul lapangan
+  // dicampur Bahasa Inggris ("North AND South", "Support Metering System",
+  // dst) — "and" kebetulan cuma ada literal di desc resmi B3 ("Health, Safety,
+  // Security AND Environmental") jadi IDF-nya timpang persis pola equipment/
+  // power/baru/sudah/pengadaan di atas. Tambah stopword fungsi Inggris umum
+  // sekalian (proaktif, bukan cuma yang kebukti bug) biar kelas bug yang sama
+  // tidak muncul lagi tiap kali ada kata fungsi Inggris baru yang kebetulan
+  // nempel ke satu desc resmi.
+  'and':1,'or':1,'of':1,'to':1,'for':1,'in':1,'on':1,'with':1,'is':1,'are':1,'the':1,
+  // 'gas'/'heat'/'flare'/'improvement' (23 Juli 2026, dataset sub-klasifikasi
+  // NBD): pola Kelas 1 yang SAMA PERSIS — kata umum di industri migas/teknik
+  // (nyaris semua fasilitas nyebut "gas"/"heat"/"flare" dalam nama), tapi
+  // kebetulan cuma muncul literal di SATU desc resmi (B3 HSSE dan ESG: "fire
+  // and GAS system", "low carbon HEAT", "FLARE/vent gas recovery") atau
+  // ("improvement" di "efficiency IMPROVEMENT"). Bukti nyata dari 167 data:
+  // "Penggantian Flare Stack" salah ke B3 (harusnya B6), "Vessel...Gas Plant"
+  // salah ke B3 (harusnya B6), "Bridge Improvement" salah ke B3 (harusnya B4).
+  // 'penambahan' pola sama: cuma literal di B2 ("penambahan produksi"), generik
+  // dipakai buat proyek APAPUN yang nambah unit, bukan cuma workover.
+  'gas':1,'heat':1,'flare':1,'improvement':1,'penambahan':1,
+  // 'vent'/'efficiency' (23 Juli 2026, ronde ke-2 diagnosa dataset yang sama):
+  // pola Kelas 1 identik lagi. 'vent' istilah pipa/instrumentasi umum (vent
+  // line, vent stack, buat melepas tekanan) tapi cuma literal di desc B3
+  // ("flare/VENT gas recovery" — program dekarbonisasi spesifik, BUKAN soal
+  // venting pipa biasa). 'efficiency' generik ("lebih efisien" bisa buat
+  // proyek apa saja) tapi cuma literal di B3 ("efficiency improvement").
+  // Bukti nyata: "Penggantian Pipa Vent Line"/"Vent Stack" salah ke B3
+  // (harusnya B6), "Peningkatan Efisiensi Pembangkit Power Plant" salah ke B3.
+  'vent':1,'efficiency':1
 };
 function tokenize(text){
   return (text||'').toLowerCase()
@@ -1285,14 +1315,47 @@ var SYNONYMS = {
   'sucker':['srp'],
 
   // -- HSSE, ESG, dekarbonisasi (kategori B3) --
-  'k3':['hsse'],
-  'keselamatan':['hsse'],
+  // 'k3'/'keselamatan' DULU cuma ke ['hsse'] — tapi 'hsse' SENDIRIAN ambigu
+  // (B2 Kerja Ulang NBD JUGA menyebut "HSSE" literal di desc resminya sebagai
+  // salah satu alasan workover, sama persis akar masalah BRV/PSV/ERV/lightning
+  // 23 Juli 2026). Bukti nyata dari dataset 167-baris: "HSSE Training &
+  // Innovation Building" dan 6 baris "Perbaikan/Peningkatan Aspek Keselamatan
+  // Pengoperasian Tangki Timbun..." semua expected B3, tapi kena tarik ke B2
+  // (persis tie/hampir-tie yang sama). Fix sama: tambah 'shutdown' sebagai
+  // target kedua, cuma ada literal di desc B3 ("safety shutdown system").
+  'k3':['hsse','shutdown'],
+  'keselamatan':['hsse','shutdown'],
+  // 'petir' (Indonesian utk "lightning") kelewat pas 'lightning'/'proteksi'
+  // dibridge 23 Juli 2026 — harusnya satu keluarga sama persis, ditemukan
+  // dari bug nyata "Pemasangan Sistem Penangkal Petir Tangki Timbun" salah
+  // ke B6 (kata 'tangki' narik lewat 'integrity' generik) padahal ini soal
+  // proteksi petir/HSSE.
+  'petir':['hsse','shutdown'],
   'kebakaran':['fire','hsse'],
   'emisi':['dekarbonisasi'],
   'karbon':['dekarbonisasi','ccus'],
-  'efisiensi':['efficiency'],
+  // 'efisiensi' dulu ke ['efficiency'], tapi 'efficiency' sekarang di-stopword
+  // (23 Juli 2026, lihat STOPWORDS) jadi target lama jadi dead code. Diganti
+  // 'kehandalan' (B4) — "efisiensi" tanpa konteks lain di data 167-baris lebih
+  // sering soal keandalan operasi pembangkit/fasilitas daripada program ESG
+  // spesifik, walau tetap bukan sinyal kuat (nudge ringan, bukan penentu).
+  'efisiensi':['kehandalan'],
   'energi':['energy'],
-  'suar':['flare'],
+  // 'suar' (Indonesian utk "flare") sebelumnya target 'flare', TAPI 'flare'
+  // sekarang di-stopword (23 Juli 2026, lihat STOPWORDS) jadi token itu hilang
+  // dari corpus juga — target diganti 'dekarbonisasi' (masih unik ke B3, flare
+  // gas recovery itu bagian dari program dekarbonisasi di desc resmi B3).
+  'suar':['dekarbonisasi'],
+  'medis':['hsse'],
+  'deteksi':['hsse'],
+  'detection':['hsse'],
+  'detector':['hsse'],
+  // 'limbah'/'tumpahan' (waste/spill) tidak ada padanan literal di desc B3,
+  // tapi 'esg' (Environmental, Social and Governance) ada literal — waste
+  // management dan penanggulangan tumpahan itu inti isu lingkungan/ESG.
+  'limbah':['esg'],
+  'tumpahan':['esg'],
+  'spill':['esg'],
 
   // -- Kehandalan operasi / disrupsi (kategori B4) --
   'gangguan':['disrupsi'],
@@ -1304,6 +1367,16 @@ var SYNONYMS = {
   'kuno':['obsolete'],
   'discontinued':['obsolete'],
   'performa':['performance'],
+  // SCADA/DCS (23 Juli 2026, dataset sub-klasifikasi NBD): sebelumnya cuma
+  // nudge flat +1 ke SEMUA item B lewat NBD_KEYWORDS, tidak bantu milih
+  // sub-kode. Di lapangan, upgrade SCADA/DCS/sistem kontrol itu hampir selalu
+  // soal mengganti sistem kontrol yang sudah usang/tidak disupport lagi
+  // manufacturernya — bukti nyata 3 dari 5 baris "Upgrade" -> B6 di dataset
+  // langsung menyebut SCADA/DCS/Generator Control System. Dijembatani
+  // langsung ke 'obsolete' (token unik B6) supaya bisa menang lawan tie
+  // generik B3/B4 dari kata "upgrading" yang dipakai bersama di dua desc itu.
+  'scada':['obsolete'],
+  'dcs':['obsolete'],
 
   // -- Asset restoration (kategori B7) --
   'kecelakaan':['insiden'],
@@ -1345,7 +1418,16 @@ var SYNONYMS = {
   'waterflood':['water','flood'],
   'infill':['pengembangan'],
   'earthwork':['lahan'],
-  'retrofit':['obsolete'],
+  // 'retrofit' DIGANTI dari ['obsolete'] (B6) ke ['restoration'] (B7), 23 Juli
+  // 2026 — atas persetujuan eksplisit Arief setelah dikasih tahu ini konflik
+  // sama logic lama. Data 167-baris: 2 baris "Retrofit" (CDGT HRSG Diverter
+  // Damper Gear Box, Minas WIP MCC Retrofit Program) sama-sama B7 Asset
+  // Restoration, bukan B6. Kalau nanti ternyata ada kasus retrofit yang
+  // memang soal obsolescence murni (bukan restorasi pasca kerusakan/insiden),
+  // itu perlu kata lain di kalimat yang secara terpisah membawa sinyal ke B6
+  // (mis. 'obsolete'/'usang' langsung) — 'retrofit' sendirian sekarang condong
+  // B7.
+  'retrofit':['restoration'],
   'availability':['kehandalan'],
   'firewater':['fire'],
   'firepump':['fire'],
@@ -1388,7 +1470,60 @@ var SYNONYMS = {
   // Inggris literal di desc resmi B5) — jembatan paling tajam buat kasus ini,
   // bukan cuma 'fasilitas' yang generik.
   'penyimpanan':['warehouse'],
-  'dokumen':['kantor']
+  'dokumen':['kantor'],
+
+  // ============================================================
+  // EKSPANSI 23 Juli 2026 — dataset 167-baris sub-klasifikasi NBD (B2-B9)
+  // dari Arief (docs/referensi/historis_subklasifikasi_nbd.tsv). Backtest
+  // awal (sebelum fix): 43.1%. Bridge di bawah nutup celah CAKUPAN (Kelas 2,
+  // pola sama dengan gedung/bangunan/penyimpanan di atas) — kata yang
+  // realistis dipakai user tapi item yang benar TIDAK PUNYA token yang cocok
+  // sama sekali, jadi skornya 0 dan tidak pernah menang walau paling relevan.
+  // ============================================================
+
+  // -- Integrity dan Obsolescence (B6): "peremajaan" (rejuvenation) tidak
+  // ada padanan literal di desc B6, tapi 'degradasi' ADA literal ("mengalami
+  // degradasi performance") dan 'obsolete' juga literal — jembatan paling
+  // tajam ke situ.
+  'peremajaan':['obsolete','degradasi'],
+  // 'integrity' (Inggris) sebelumnya CUMA match B2 (via "well integrity"
+  // literal di desc B2). Data baru: "Integritas/integrity" jadi keyword tag
+  // buat 4 baris B6 (Integrity DAN Obsolescence, namanya sendiri harfiah
+  // "integritas fasilitas operasi" di desc). Ditambah, bukan diganti — B2
+  // tetap kena lewat jalur yang sama seperti sebelumnya.
+  'integrity':['integritas'],
+
+  // -- Kehandalan Operasi (B4): "Bridge/Jembatan" dan "Pengadaan Ready Line"
+  // dua pola dengan volume besar di data (3 dan 8 baris) yang sebelumnya
+  // skornya 0 di B4 sama sekali. Jembatan/akses fasilitas yang rusak/perlu
+  // upgrade = potensi disrupsi operasi; unit siaga (ready line) = mencegah
+  // LPO/downtime — dua-duanya inti definisi B4 ("mengurangi potensi disrupsi
+  // operasi, LPO, dan kegagalan peralatan atau operation downtime").
+  'jembatan':['disrupsi','fasilitas'],
+  'bridge':['disrupsi','fasilitas'],
+  'readyline':['lpo','disrupsi'],
+  'ready':['lpo','disrupsi'],
+
+  // -- Asset Restoration (B7): nama resmi Inggris "Asset Restoration", token
+  // 'restoration' sebelumnya tidak dijembatani dari kata apa pun. Data baru
+  // nunjukin 5 dari 7 baris B7 pakai salah satu dari kata-kata di bawah.
+  // 'reaktivasi'/'reactivation'/dst SUDAH ada baris di atas (target
+  // 'reactivation', dipakai buat A6 Field Reactivation) — di sini DITAMBAH
+  // 'restoration' sebagai target kedua, BUKAN pengganti. Aman karena kategori
+  // A dan B dipisah gate keras chip "Manfaat Utama Proyek" (lihat
+  // suggestClassification), jadi dua target ini tidak pernah "rebutan" di
+  // kandidat kategori yang sama.
+  'restorasi':['restoration'],
+  'refurbishment':['restoration'],
+  'aktivasi':['restoration'],
+
+  // -- Operation Support (B5): "Perbaikan Jalan" (perawatan akses jalan
+  // EKSISTING) kebetulan tidak dapat bridge apa pun ke B5, tapi 'jalan' malah
+  // literal match ke C6 ("Pembangunan AKSES JALAN untuk kegiatan proyek" —
+  // itu soal jalan BARU buat proyek pra-konstruksi, konsep beda). 'fasilitas'
+  // cukup buat bikin B5 kompetitif (bukan exclusive/dominan, cuma nutup celah
+  // skor 0 sebelumnya).
+  'jalan':['fasilitas']
 };
 // Penalti eksplisit static vs rotating — dua kelas equipment yang berlawanan
 // secara teknik, tidak bisa dijembatani lewat overlap kata biasa.
@@ -1433,7 +1568,29 @@ function expandWithSynonyms(tokens, contextTokens){
   var out = tokens.slice();
   var hasWellContext = ctx.some(function(t){ return WELL_EQUIPMENT_CONTEXT.indexOf(t) > -1; });
   tokens.forEach(function(t){
-    if(t==='pompa' || t==='sewa'){
+    // 'pompa'/'pump' (23 Juli 2026, dataset sub-klasifikasi NBD, disetujui
+    // Arief): SELALU dijembatani ke 'rotating' (token unik B8 "Rotating
+    // Equipment Change Out"), TIDAK PEDULI ada bukti konteks sumur atau
+    // tidak — beda dari ekspansi artificial/lift di bawah yang TETAP kondisional.
+    // Alasan: B8 secara definisi resmi ("Penggantian rotating equipment,
+    // termasuk ESP") mencakup SEMUA pompa/rotating machinery, bukan cuma
+    // artificial lift downhole. Data nyata: 15 baris pompa FASILITAS
+    // PERMUKAAN (cooling pond, PDAM, fire pump, ORF filter, dst — TIDAK ada
+    // konteks sumur sama sekali) semua diklasifikasi B8. Jalur artificial/lift
+    // di bawah (yang butuh WELL_EQUIPMENT_CONTEXT, fix 23 Juli sebelumnya
+    // buat bug "pompa fasilitas produksi" ketarik ke D1.b) TIDAK diubah —
+    // dua jalur ini independen, 'rotating' menuju B8 (NBD, "Penggantian
+    // rotating equipment"), 'artificial'+'lift' menuju kode sumur spesifik.
+    // 'pump' (Inggris) ditambah di sini juga — sebelumnya TIDAK ada jembatan
+    // sama sekali buat kata Inggris ini padahal banyak judul lapangan pakai
+    // "Pump" bukan "Pompa" (Sump Pump, Fire Pump, Transfer Pump, dst).
+    if(t==='pompa' || t==='pump'){
+      out.push('peralatan');
+      out.push('rotating');
+      if(hasWellContext){ out.push('artificial'); out.push('lift'); }
+      return;
+    }
+    if(t==='sewa'){
       out.push('peralatan');
       if(hasWellContext){ out.push('artificial'); out.push('lift'); }
       return;
