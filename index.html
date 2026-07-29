@@ -1119,7 +1119,21 @@ var STOPWORDS = {
   // spesifik kayak pompa/substation) — kata bantu waktu generik seharusnya
   // dari awal masuk stopword, kelewat pas daftar awal dibikin.
   'sudah':1,
-  'telah':1
+  'telah':1,
+  // 'pengadaan' (23 Juli 2026, bug ke-9 pola sama): kata administratif generik
+  // ("procurement", bisa buat pengadaan APAPUN — sumur, fasilitas produksi,
+  // kantor, lahan) tapi kebetulan cuma muncul literal di B5 desc ("pengadaan
+  // peralatan yang TIDAK berhubungan langsung dengan operasi produksi") dan
+  // nama C2 ("Pengadaan Lahan"). IDF-nya ~3.0, dan karena kebetulan ada di
+  // Nama Kegiatan (bobot 2x), kontribusinya bisa ngalahin sinyal yang jauh
+  // lebih relevan (mis. token "lpo" literal). Bug nyata: "Pengadaan Ready Line
+  // Peralatan Substation" (soal keandalan pasokan listrik produksi, LPO) salah
+  // kedeteksi B5 Operation Support — padahal desc resmi B5 JUSTRU eksplisit
+  // bilang "TIDAK berhubungan langsung dengan operasi produksi", kebalikan
+  // dari kasus ini. 'pengadaan' juga DICABUT dari NBD_KEYWORDS di bawah karena
+  // begitu di-stopword, kata itu tidak akan pernah lolos tokenize() lagi jadi
+  // entri di NBD_KEYWORDS untuk kata ini otomatis jadi dead code.
+  'pengadaan':1
 };
 function tokenize(text){
   return (text||'').toLowerCase()
@@ -1441,7 +1455,10 @@ var BD_KEYWORDS = ['development','pengembangan','pemboran','pengeboran','pembaya
 // generik berisiko tinggi (Motor/Gas/Phase/Header/Improvement standalone —
 // pola bug equipment/power yang sama, kata umum "kebetulan khas" gampang
 // menyeret konteks salah, lihat Riwayat Perubahan 23 Juli 2026).
-var NBD_KEYWORDS = ['penggantian','upgrade','pengadaan','peralatan','fasilitas','pipa','peningkatan','substation','kehandalan','perbaikan','repair','optimasi','peremajaan','obsolete','scada','dcs','mcc','relay','switchgear','transformer','ups','gcb','recloser','metering','detection','vessel','exchanger','stack','utility'];
+// 'pengadaan' DICABUT dari sini 23 Juli 2026 — sudah masuk STOPWORDS (lihat
+// komentar di sana), jadi tidak akan pernah lolos tokenize() lagi untuk
+// dicek terhadap daftar ini. Menyisakannya di sini cuma jadi dead code.
+var NBD_KEYWORDS = ['penggantian','upgrade','peralatan','fasilitas','pipa','peningkatan','substation','kehandalan','perbaikan','repair','optimasi','peremajaan','obsolete','scada','dcs','mcc','relay','switchgear','transformer','ups','gcb','recloser','metering','detection','vessel','exchanger','stack','utility'];
 
 var NAMA_WEIGHT = 2;
 var LATAR_WEIGHT = 1;
